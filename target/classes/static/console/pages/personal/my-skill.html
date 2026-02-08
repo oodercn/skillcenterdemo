@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的技能 - SkillCenter</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+</head>
+<body>
+    <aside class="skillcenter-sidebar" id="sidebar">
+        <!-- 菜单将通过menu.js动态加载 -->
+    </aside>
+    <div class="skillcenter-content-with-sidebar">
+        <header class="header">
+            <h1>我的技能</h1>
+            <div class="user-info">
+                <span class="user-name">用户</span>
+                <i class="ri-user-line"></i>
+            </div>
+        </header>
+        <div class="skill-content">
+            <div class="skill-actions">
+                <button class="btn-primary" id="publish-skill-btn">
+                    <i class="ri-upload-line"></i> 发布技能
+                </button>
+                <div class="skill-search">
+                    <input type="text" placeholder="搜索技能..." id="skill-search-input">
+                    <button class="btn-search">
+                        <i class="ri-search-line"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="skill-list" id="skill-list">
+                <!-- 技能列表将通过JavaScript动态加载 -->
+            </div>
+        </div>
+    </div>
+    <!-- 发布技能模态框 -->
+    <div class="modal" id="publish-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>发布技能</h2>
+                <button class="close-btn" id="close-publish-modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="publish-skill-form">
+                    <div class="form-group">
+                        <label for="skill-id">技能ID</label>
+                        <input type="text" id="skill-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-name">技能名称</label>
+                        <input type="text" id="skill-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-description">技能描述</label>
+                        <textarea id="skill-description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-category">技能分类</label>
+                        <select id="skill-category" required>
+                            <option value="development">开发工具</option>
+                            <option value="utilities">实用工具</option>
+                            <option value="analysis">数据分析</option>
+                            <option value="automation">自动化</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-version">版本</label>
+                        <input type="text" id="skill-version" value="1.0.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-download-url">下载地址</label>
+                        <input type="text" id="skill-download-url" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancel-publish-btn">取消</button>
+                <button class="btn-primary" id="submit-publish-btn">发布</button>
+            </div>
+        </div>
+    </div>
+    <!-- 更新技能模态框 -->
+    <div class="modal" id="update-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>更新技能</h2>
+                <button class="close-btn" id="close-update-modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="update-skill-form">
+                    <input type="hidden" id="update-skill-id">
+                    <div class="form-group">
+                        <label for="update-skill-name">技能名称</label>
+                        <input type="text" id="update-skill-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="update-skill-description">技能描述</label>
+                        <textarea id="update-skill-description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="update-skill-category">技能分类</label>
+                        <select id="update-skill-category" required>
+                            <option value="development">开发工具</option>
+                            <option value="utilities">实用工具</option>
+                            <option value="analysis">数据分析</option>
+                            <option value="automation">自动化</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="update-skill-version">版本</label>
+                        <input type="text" id="update-skill-version" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="update-skill-download-url">下载地址</label>
+                        <input type="text" id="update-skill-download-url" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancel-update-btn">取消</button>
+                <button class="btn-primary" id="submit-update-btn">更新</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/my-skill.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帮助与支持 - SkillCenter 控制台</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/skillcenter/console/css/pages/help.css">
+    <script src="/skillcenter/console/js/utils.js"></script>
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/pages/help.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边导航栏 -->
+        <div class="sidebar">
+            <h2 style="display: flex; align-items: center; gap: 12px;"><i class="ri-bolt-line"></i> SkillCenter</h2>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="header">
+                <h1><span>⚡</span> 帮助与支持</h1>
+                <div class="subtitle">
+                    <span class="badge" style="background-color: var(--ooder-primary); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-right: 16px;">v0.6.5</span>
+                    <span>Ooder Rad Style</span> | 
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+            
+            <!-- 标签页导航 -->
+            <div class="section" style="padding-bottom: 0;">
+                <div style="display: flex; border-bottom: 1px solid var(--ooder-border); margin-bottom: 0;">
+                    <button class="btn btn-secondary" style="border-radius: var(--ooder-radius) var(--ooder-radius) 0 0; border-bottom: none; margin-right: 0;" onclick="switchTab('help-guide')">用户指南</button>
+                    <button class="btn btn-secondary" style="border-radius: 0; border-bottom: none; margin-right: 0;" onclick="switchTab('help-faq')">常见问题</button>
+                    <button class="btn btn-secondary" style="border-radius: 0; border-bottom: none; margin-right: 0;" onclick="switchTab('help-about')">关于系统</button>
+                    <button class="btn btn-secondary" style="border-radius: 0 var(--ooder-radius) 0 0; border-bottom: none; margin-right: 0;" onclick="switchTab('help-contact')">联系支持</button>
+                </div>
+            </div>
+            
+            <!-- 标签页内容 -->
+            <div class="section">
+                <!-- 用户指南标签页 -->
+                <div id="help-guide-tab" class="tab-content">
+                    <h3>用户指南</h3>
+                    <div style="margin-bottom: 16px;">
+                        <h4>平台介绍</h4>
+                        <p style="color: var(--ooder-secondary); margin-bottom: 16px;">SkillCenter 是一个技能管理和执行平台，支持技能的注册、执行、发布和管理。</p>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <h4>核心功能</h4>
+                        <ul style="color: var(--ooder-secondary); margin-left: 24px;">
+                            <li>技能管理：注册、编辑、删除技能</li>
+                            <li>技能执行：执行技能并查看结果</li>
+                            <li>市场管理：发布和下载技能</li>
+                            <li>存储管理：备份和恢复数据</li>
+                            <li>系统管理：监控和控制系统</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>使用流程</h4>
+                        <ol style="color: var(--ooder-secondary); margin-left: 24px;">
+                            <li>登录系统</li>
+                            <li>注册新技能或从市场下载技能</li>
+                            <li>配置技能参数</li>
+                            <li>执行技能并查看结果</li>
+                            <li>管理技能和查看执行历史</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <!-- 常见问题标签页 -->
+                <div id="help-faq-tab" class="tab-content hidden">
+                    <h3>常见问题</h3>
+                    <div style="margin-bottom: 16px;">
+                        <h4>技能管理</h4>
+                        <div style="background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); margin-bottom: 8px;">
+                            <h5 style="margin-bottom: 8px;">如何注册新技能？</h5>
+                            <p style="color: var(--ooder-secondary);">在技能管理页面，点击"注册技能"按钮，填写技能信息并提交。</p>
+                        </div>
+                        <div style="background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); margin-bottom: 8px;">
+                            <h5 style="margin-bottom: 8px;">如何发布技能到市场？</h5>
+                            <p style="color: var(--ooder-secondary);">在技能管理页面，选择要发布的技能，点击"发布到市场"按钮。</p>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <h4>技能执行</h4>
+                        <div style="background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); margin-bottom: 8px;">
+                            <h5 style="margin-bottom: 8px;">如何执行技能？</h5>
+                            <p style="color: var(--ooder-secondary);">在执行管理页面，选择要执行的技能，填写执行参数并点击"执行"按钮。</p>
+                        </div>
+                        <div style="background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); margin-bottom: 8px;">
+                            <h5 style="margin-bottom: 8px;">如何查看执行历史？</h5>
+                            <p style="color: var(--ooder-secondary);">在执行管理页面，切换到"执行历史"标签页查看执行记录。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 关于系统标签页 -->
+                <div id="help-about-tab" class="tab-content hidden">
+                    <h3>关于系统</h3>
+                    <div style="margin-bottom: 16px;">
+                        <h4>系统信息</h4>
+                        <div class="status-grid">
+                            <div class="status-item ok">
+                                <div class="key">系统版本</div>
+                                <div class="value">v0.6.5</div>
+                            </div>
+                            <div class="status-item ok">
+                                <div class="key">设计风格</div>
+                                <div class="value">Ooder Rad Style</div>
+                            </div>
+                            <div class="status-item ok">
+                                <div class="key">Java版本</div>
+                                <div class="value">1.8+</div>
+                            </div>
+                            <div class="status-item ok">
+                                <div class="key">服务端口</div>
+                                <div class="value">8081</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>技术栈</h4>
+                        <ul style="color: var(--ooder-secondary); margin-left: 24px;">
+                            <li>后端：Spring Boot 2.7.x</li>
+                            <li>前端：HTML5, CSS3, JavaScript</li>
+                            <li>设计：Ooder Rad Style (暗色主题)</li>
+                            <li>支持：Java 8+</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 联系支持标签页 -->
+                <div id="help-contact-tab" class="tab-content hidden">
+                    <h3>联系支持</h3>
+                    <div style="margin-bottom: 16px;">
+                        <h4>支持渠道</h4>
+                        <div style="background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); margin-bottom: 8px;">
+                            <h5 style="margin-bottom: 8px;">技术支持</h5>
+                            <p style="color: var(--ooder-secondary);">邮箱：support@skillcenter.com</p>
+                            <p style="color: var(--ooder-secondary);">电话：400-123-4567</p>
+                        </div>
+                        <div style="background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); margin-bottom: 8px;">
+                            <h5 style="margin-bottom: 8px;">反馈建议</h5>
+                            <p style="color: var(--ooder-secondary);">邮箱：feedback@skillcenter.com</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>提交问题</h4>
+                        <form id="support-form">
+                            <div style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 8px;">问题类型</label>
+                                <select style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); width: 300px;">
+                                    <option>技术问题</option>
+                                    <option>功能建议</option>
+                                    <option>Bug报告</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 8px;">问题描述</label>
+                                <textarea style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); width: 100%; height: 120px;"></textarea>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <label style="display: block; margin-bottom: 8px;">联系方式</label>
+                                <input type="email" placeholder="您的邮箱" style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); width: 300px;">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="submitSupportRequest()">提交</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

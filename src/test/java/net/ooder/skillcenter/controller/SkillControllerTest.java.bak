@@ -1,0 +1,190 @@
+package net.ooder.skillcenter.controller;
+
+import net.ooder.skillcenter.manager.SkillManager;
+import net.ooder.skillcenter.model.PageResponse;
+import net.ooder.skillcenter.model.Skill;
+import net.ooder.skillcenter.model.SkillContext;
+import net.ooder.skillcenter.model.SkillException;
+import net.ooder.skillcenter.model.SkillParam;
+import net.ooder.skillcenter.model.SkillResult;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+/**
+ * SkillController 分批API单元测试
+ */
+public class SkillControllerTest {
+
+    @Mock
+    private SkillManager skillManager;
+
+    @InjectMocks
+    private SkillController skillController;
+
+    private List<Skill> mockSkills;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        
+        // 初始化模拟数据
+        mockSkills = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            final int finalI = i; // 创建最终变量来捕获i的值
+            // 创建一个匿名内部类来模拟Skill接口
+            Skill skill = new Skill() {
+                private String id = "skill-" + finalI;
+                private String name = "Skill " + finalI;
+                
+                @Override
+                public String getId() {
+                    return id;
+                }
+                
+                @Override
+                public String getName() {
+                    return name;
+                }
+                
+                @Override
+                public String getDescription() {
+                    return "Test skill " + finalI;
+                }
+                
+                @Override
+                public SkillResult execute(SkillContext context) throws SkillException {
+                    return null;
+                }
+                
+                @Override
+                public boolean isAvailable() {
+                    return true;
+                }
+                
+                @Override
+                public Map<String, SkillParam> getParams() {
+                    return new HashMap<>();
+                }
+            };
+            mockSkills.add(skill);
+        }
+        
+        // 模拟SkillManager的方法
+        when(skillManager.getAllSkills()).thenReturn(mockSkills);
+        when(skillManager.getSkillsByCategory("test-category")).thenReturn(mockSkills.subList(0, 10));
+    }
+
+    /**
+     * 测试获取所有技能的分页功能
+     */
+    @Test
+    void testGetAllSkills_Pagination() {
+        // 测试第一页
+        ResponseEntity<PageResponse<Skill>> response1 = skillController.getAllSkills(1, 10, null, "asc");
+        PageResponse<Skill> page1 = response1.getBody();
+        assertNotNull(page1);
+        assertEquals(1, page1.getPage());
+        assertEquals(10, page1.getSize());
+        assertEquals(20, page1.getTotalElements());
+        assertEquals(2, page1.getTotalPages());
+        assertEquals(10, page1.getContent().size());
+        assertFalse(page1.isHasPrevious());
+        assertTrue(page1.isHasNext());
+
+        // 测试第二页
+        ResponseEntity<PageResponse<Skill>> response2 = skillController.getAllSkills(2, 10, null, "asc");
+        PageResponse<Skill> page2 = response2.getBody();
+        assertNotNull(page2);
+        assertEquals(2, page2.getPage());
+        assertEquals(10, page2.getSize());
+        assertEquals(20, page2.getTotalElements());
+        assertEquals(2, page2.getTotalPages());
+        assertEquals(10, page2.getContent().size());
+        assertTrue(page2.isHasPrevious());
+        assertFalse(page2.isHasNext());
+
+        // 测试不存在的页面
+        ResponseEntity<PageResponse<Skill>> response3 = skillController.getAllSkills(3, 10, null, "asc");
+        PageResponse<Skill> page3 = response3.getBody();
+        assertNotNull(page3);
+        assertEquals(3, page3.getPage());
+        assertEquals(10, page3.getSize());
+        assertEquals(20, page3.getTotalElements());
+        assertEquals(2, page3.getTotalPages());
+        assertTrue(page3.isHasPrevious());
+        assertFalse(page3.isHasNext());
+        assertTrue(page3.getContent().isEmpty());
+    }
+
+    /**
+     * 测试获取所有技能的排序功能
+     */
+    @Test
+    void testGetAllSkills_Sorting() {
+        // 测试按名称排序（升序）
+        ResponseEntity<PageResponse<Skill>> responseAsc = skillController.getAllSkills(1, 10, "name", "asc");
+        PageResponse<Skill> pageAsc = responseAsc.getBody();
+        assertNotNull(pageAsc);
+        assertEquals(10, pageAsc.getContent().size());
+        // 验证排序结果
+        for (int i = 0; i < pageAsc.getContent().size() - 1; i++) {
+            String currentName = pageAsc.getContent().get(i).getName();
+            String nextName = pageAsc.getContent().get(i + 1).getName();
+            assertTrue(currentName.compareTo(nextName) <= 0);
+        }
+
+        // 测试按名称排序（降序）
+        ResponseEntity<PageResponse<Skill>> responseDesc = skillController.getAllSkills(1, 10, "name", "desc");
+        PageResponse<Skill> pageDesc = responseDesc.getBody();
+        assertNotNull(pageDesc);
+        assertEquals(10, pageDesc.getContent().size());
+        // 验证排序结果
+        for (int i = 0; i < pageDesc.getContent().size() - 1; i++) {
+            String currentName = pageDesc.getContent().get(i).getName();
+            String nextName = pageDesc.getContent().get(i + 1).getName();
+            assertTrue(currentName.compareTo(nextName) >= 0);
+        }
+    }
+
+    /**
+     * 测试根据分类获取技能的分页功能
+     */
+    @Test
+    void testGetSkillsByCategory_Pagination() {
+        // 测试第一页
+        ResponseEntity<PageResponse<Skill>> response1 = skillController.getSkillsByCategory("test-category", 1, 5, null, "asc");
+        PageResponse<Skill> page1 = response1.getBody();
+        assertNotNull(page1);
+        assertEquals(1, page1.getPage());
+        assertEquals(5, page1.getSize());
+        assertEquals(10, page1.getTotalElements());
+        assertEquals(2, page1.getTotalPages());
+        assertEquals(5, page1.getContent().size());
+        assertFalse(page1.isHasPrevious());
+        assertTrue(page1.isHasNext());
+
+        // 测试第二页
+        ResponseEntity<PageResponse<Skill>> response2 = skillController.getSkillsByCategory("test-category", 2, 5, null, "asc");
+        PageResponse<Skill> page2 = response2.getBody();
+        assertNotNull(page2);
+        assertEquals(2, page2.getPage());
+        assertEquals(5, page2.getSize());
+        assertEquals(10, page2.getTotalElements());
+        assertEquals(2, page2.getTotalPages());
+        assertEquals(5, page2.getContent().size());
+        assertTrue(page2.isHasPrevious());
+        assertFalse(page2.isHasNext());
+    }
+}

@@ -1,0 +1,35 @@
+[
+	{
+		"description":"用于生成各种代码模板",
+		"groupId":"dev-team",
+		"groupName":"开发团队",
+		"id":"group-skill-001",
+		"sharedAt":"2026-01-20",
+		"sharedBy":"张三",
+		"skillId":"code-generator",
+		"skillName":"代码生成",
+		"status":"active"
+	},
+	{
+		"description":"格式化JSON数据",
+		"groupId":"dev-team",
+		"groupName":"开发团队",
+		"id":"group-skill-002",
+		"sharedAt":"2026-01-22",
+		"sharedBy":"李四",
+		"skillId":"json-formatter",
+		"skillName":"JSON格式化",
+		"status":"active"
+	},
+	{
+		"description":"调整图片大小",
+		"groupId":"marketing-team",
+		"groupName":"市场团队",
+		"id":"group-skill-003",
+		"sharedAt":"2026-01-25",
+		"sharedBy":"王五",
+		"skillId":"image-resizer",
+		"skillName":"图片 resize",
+		"status":"active"
+	}
+]

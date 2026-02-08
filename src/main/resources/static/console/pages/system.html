@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统管理 - SkillCenter 控制台</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+    <script src="/skillcenter/console/js/pages/system.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边导航栏 -->
+        <aside class="sidebar" id="sidebar">
+            <!-- 菜单将通过menu.js动态加载 -->
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <div class="header">
+                <h1><i class="ri-server-line"></i> 系统管理</h1>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                </div>
+            </div>
+            
+            <!-- 标签页导航 -->
+            <div class="section" style="padding-bottom: 0;">
+                <div style="display: flex; border-bottom: 1px solid var(--ooder-border); margin-bottom: 0;">
+                    <button class="btn btn-secondary" style="border-radius: var(--ooder-radius) var(--ooder-radius) 0 0; border-bottom: none; margin-right: 0;" onclick="switchTab('system-status')">系统状态</button>
+                    <button class="btn btn-secondary" style="border-radius: 0; border-bottom: none; margin-right: 0;" onclick="switchTab('system-config')">系统配置</button>
+                    <button class="btn btn-secondary" style="border-radius: 0; border-bottom: none; margin-right: 0;" onclick="switchTab('system-control')">系统控制</button>
+                    <button class="btn btn-secondary" style="border-radius: 0 var(--ooder-radius) 0 0; border-bottom: none; margin-right: 0;" onclick="switchTab('system-logs')">系统日志</button>
+                </div>
+            </div>
+            
+            <!-- 标签页内容 -->
+            <div class="section">
+                <!-- 系统状态标签页 -->
+                <div id="system-status-tab" class="tab-content">
+                    <h3>系统状态</h3>
+                    <div class="status-grid">
+                        <div class="status-item ok">
+                            <div class="key">系统版本</div>
+                            <div class="value">v2.0</div>
+                        </div>
+                        <div class="status-item ok">
+                            <div class="key">Java版本</div>
+                            <div class="value">1.8.0_302</div>
+                        </div>
+                        <div class="status-item ok">
+                            <div class="key">服务端口</div>
+                            <div class="value">8081</div>
+                        </div>
+                        <div class="status-item ok">
+                            <div class="key">运行时间</div>
+                            <div class="value">24天</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <h4>系统资源</h4>
+                        <div class="status-grid" style="margin-top: 8px;">
+                            <div class="status-item ok">
+                                <div class="key">CPU使用率</div>
+                                <div class="value">25%</div>
+                            </div>
+                            <div class="status-item ok">
+                                <div class="key">内存使用率</div>
+                                <div class="value">45%</div>
+                            </div>
+                            <div class="status-item ok">
+                                <div class="key">磁盘使用率</div>
+                                <div class="value">30%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 系统配置标签页 -->
+                <div id="system-config-tab" class="tab-content hidden">
+                    <h3>系统配置</h3>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px;">服务端口</label>
+                        <input type="number" id="server-port" value="8081" style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); width: 100px;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px;">API路径</label>
+                        <input type="text" id="api-path" value="/skillcenter/api" style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); width: 300px;">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px;">最大技能数</label>
+                        <input type="number" id="max-skills" value="100" style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); width: 100px;">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSystemConfig()">保存配置</button>
+                </div>
+                
+                <!-- 系统控制标签页 -->
+                <div id="system-control-tab" class="tab-content hidden">
+                    <h3>系统控制</h3>
+                    <div style="margin-bottom: 16px;">
+                        <button class="btn btn-primary" onclick="restartSystem()">重启系统</button>
+                        <button class="btn btn-danger" onclick="shutdownSystem()">关闭系统</button>
+                        <button class="btn btn-secondary" onclick="clearSystemCache()">清理缓存</button>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <h4>系统操作日志</h4>
+                        <div id="system-operation-log">
+                            <!-- 系统操作日志将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 系统日志标签页 -->
+                <div id="system-logs-tab" class="tab-content hidden">
+                    <h3>系统日志</h3>
+                    <div style="margin-bottom: 16px;">
+                        <select id="log-level" style="padding: 10px; border: 1px solid var(--ooder-border); border-radius: var(--ooder-radius); background-color: #1a1a1a; color: var(--ooder-dark); margin-right: 12px;">
+                            <option value="ALL">全部</option>
+                            <option value="ERROR">错误</option>
+                            <option value="WARN">警告</option>
+                            <option value="INFO">信息</option>
+                            <option value="DEBUG">调试</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="loadSystemLogs()">加载日志</button>
+                        <button class="btn btn-danger" onclick="clearSystemLogs()">清空日志</button>
+                    </div>
+                    <div id="system-logs-content" style="max-height: 400px; overflow-y: auto; background-color: #1a1a1a; padding: 16px; border-radius: var(--ooder-radius); font-family: 'Courier New', monospace; font-size: 12px;">
+                        <!-- 系统日志将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/system.js"></script>
+</body>
+</html>

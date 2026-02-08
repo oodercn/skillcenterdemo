@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理中心 - 存储管理</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+    <script src="/skillcenter/console/js/tab-component.js"></script>
+    <script src="/skillcenter/console/js/app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <!-- 菜单将通过menu.js动态加载 -->
+        </aside>
+        <main class="main-content" id="main-content">
+            <header class="header">
+                <h1>存储管理</h1>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <div class="admin-dashboard-content">
+                <div class="page-header">
+                    <button class="btn btn-primary" onclick="openAddStorageModal()">
+                        <i class="ri-database-add-line"></i> 添加存储
+                    </button>
+                </div>
+        
+        <!-- 存储统计 -->
+        <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon ri-database-fill" style="color: #27ae60;"></div>
+                <div class="admin-stat-info">
+                    <h3>总存储容量</h3>
+                    <div class="admin-stat-value">12.5 GB</div>
+                </div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon ri-database-line" style="color: #3498db;"></div>
+                <div class="admin-stat-info">
+                    <h3>已使用容量</h3>
+                    <div class="admin-stat-value">8.2 GB</div>
+                </div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon ri-database-2-line" style="color: #27ae60;"></div>
+                <div class="admin-stat-info">
+                    <h3>可用容量</h3>
+                    <div class="admin-stat-value">4.3 GB</div>
+                </div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon ri-percent-line" style="color: #f39c12;"></div>
+                <div class="admin-stat-info">
+                    <h3>使用率</h3>
+                    <div class="admin-stat-value">65.6%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 存储类型标签 -->
+        <div class="execution-tabs">
+            <button class="tab-btn active" data-tab="json">JSON存储</button>
+            <button class="tab-btn" data-tab="vfs">VFS存储</button>
+            <button class="tab-btn" data-tab="all">所有存储</button>
+        </div>
+        
+        <!-- 存储内容 -->
+        <div class="system-info-card">
+            <h3>存储管理</h3>
+            
+            <!-- JSON存储内容 -->
+            <div id="jsonTab" class="tab-content active">
+                <div class="storage-list" id="jsonStorageList">
+                    <!-- JSON存储项目将通过JavaScript动态填充 -->
+                </div>
+            </div>
+            
+            <!-- VFS存储内容 -->
+            <div id="vfsTab" class="tab-content" style="display: none;">
+                <div class="storage-list" id="vfsStorageList">
+                    <!-- VFS存储项目将通过JavaScript动态填充 -->
+                    <div class="empty-state">
+                        <i class="ri-hard-drive-2-line" style="font-size: 48px; color: #ccc;"></i>
+                        <p>暂无VFS存储项目</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 所有存储内容 -->
+            <div id="allTab" class="tab-content" style="display: none;">
+                <div class="storage-list" id="allStorageList">
+                    <!-- 所有存储项目将通过JavaScript动态填充 -->
+                    <div class="empty-state">
+                        <i class="ri-database-2-line" style="font-size: 48px; color: #ccc;"></i>
+                        <p>显示所有存储项目</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加存储模态框 -->
+        <div id="storageModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>添加存储</h2>
+                    <button class="close-btn" onclick="closeStorageModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="storageForm">
+                        <div class="form-group">
+                            <label for="storageName">存储名称</label>
+                            <input type="text" id="storageName" required class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="storageType">存储类型</label>
+                            <select id="storageType" required class="form-control">
+                                <option value="json">JSON存储</option>
+                                <option value="vfs">VFS存储</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="storagePath">存储路径</label>
+                            <input type="text" id="storagePath" required class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeStorageModal()">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveStorageSettings()">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/storage-management.js"></script>
+</main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+[
+	{
+		"createdAt":"2026-01-01",
+		"description":"公司的开发团队，负责产品的技术开发",
+		"id":"dev-team",
+		"memberCount":15,
+		"name":"开发团队",
+		"role":"成员",
+		"status":"active"
+	},
+	{
+		"createdAt":"2026-01-05",
+		"description":"公司的市场团队，负责产品的市场推广",
+		"id":"marketing-team",
+		"memberCount":8,
+		"name":"市场团队",
+		"role":"成员",
+		"status":"active"
+	},
+	{
+		"createdAt":"2026-01-10",
+		"description":"公司的人力资源团队，负责人事管理",
+		"id":"hr-team",
+		"memberCount":5,
+		"name":"人力资源团队",
+		"role":"管理员",
+		"status":"active"
+	}
+]

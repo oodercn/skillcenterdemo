@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技能管理 - SkillCenter 控制台</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <!-- 菜单将通过menu.js动态加载 -->
+        </aside>
+        <main class="main-content">
+            <div class="header">
+                <h1><i class="ri-tools-line"></i> 技能管理</h1>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                </div>
+            </div>
+            
+            <!-- 标签页导航 -->
+            <div class="section" style="padding-bottom: 0;">
+                <div style="display: flex; border-bottom: 1px solid var(--ooder-border); margin-bottom: 0;">
+                    <button class="btn btn-secondary" style="border-radius: var(--ooder-radius) var(--ooder-radius) 0 0; border-bottom: none; margin-right: 0;" onclick="switchTab('skill-list')">技能列表</button>
+                    <button class="btn btn-secondary" style="border-radius: 0; border-bottom: none; margin-right: 0;" onclick="switchTab('skill-publish')">发布技能</button>
+                    <button class="btn btn-secondary" style="border-radius: 0 var(--ooder-radius) 0 0; border-bottom: none; margin-right: 0;" onclick="switchTab('skill-categories')">技能分类</button>
+                </div>
+            </div>
+            
+            <!-- 标签页内容 -->
+            <div class="section">
+                <!-- 技能列表标签页 -->
+                <div id="skill-list-tab" class="tab-content">
+                    <!-- 传统表格视图 -->
+                    <div class="table-container" style="margin-bottom: 24px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>技能ID</th>
+                                    <th>技能名称</th>
+                                    <th>分类</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="skillTableBody">
+                                <!-- 技能数据将通过DataTable动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 模板渲染视图 -->
+                    <h3 style="margin-bottom: 16px; color: var(--ooder-primary);">模板渲染视图</h3>
+                    <div class="skill-list-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;"></div>
+                </div>
+                
+                <!-- 发布技能标签页 -->
+                <div id="skill-publish-tab" class="tab-content hidden">
+                    <div class="form-group">
+                        <label for="skill-id">技能ID</label>
+                        <input type="text" id="skill-id" placeholder="请输入技能ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-name">技能名称</label>
+                        <input type="text" id="skill-name" placeholder="请输入技能名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-category">技能分类</label>
+                        <select id="skill-category">
+                            <option value="text-processing">文本处理</option>
+                            <option value="development">开发工具</option>
+                            <option value="deployment">部署工具</option>
+                            <option value="media">媒体处理</option>
+                            <option value="storage">存储服务</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-description">技能描述</label>
+                        <textarea id="skill-description" rows="4" placeholder="请输入技能描述"></textarea>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <button class="btn btn-primary" onclick="publishSkill()">发布技能</button>
+                    </div>
+                </div>
+                
+                <!-- 技能分类标签页 -->
+                <div id="skill-categories-tab" class="tab-content hidden">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>分类名称</th>
+                                    <th>技能数量</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>文本处理</td>
+                                    <td>1</td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="viewSkillsByCategory('text-processing')">查看技能</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>开发工具</td>
+                                    <td>1</td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="viewSkillsByCategory('development')">查看技能</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>部署工具</td>
+                                    <td>1</td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="viewSkillsByCategory('deployment')">查看技能</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/skill.js"></script>
+</body>
+</html>

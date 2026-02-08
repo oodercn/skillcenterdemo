@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理中心 - 技能管理</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <!-- 菜单将通过menu.js动态加载 -->
+        </aside>
+        <main class="main-content" id="main-content">
+            <header class="header">
+                <h1>技能管理</h1>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <!-- 筛选查询区域 -->
+            <div class="filter-section">
+                <div class="filter-form">
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label for="filterCategory">技能分类</label>
+                            <select id="filterCategory" class="form-control">
+                                <option value="">全部分类</option>
+                                <option value="text-processing">文本处理</option>
+                                <option value="development">开发工具</option>
+                                <option value="deployment">部署工具</option>
+                                <option value="media">媒体处理</option>
+                                <option value="storage">存储管理</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label for="filterStatus">技能状态</label>
+                            <select id="filterStatus" class="form-control">
+                                <option value="">全部状态</option>
+                                <option value="active">活跃</option>
+                                <option value="pending">待审核</option>
+                                <option value="inactive">停用</option>
+                            </select>
+                        </div>
+                        <div class="filter-item filter-item-large">
+                            <label for="filterKeyword">关键词</label>
+                            <input type="text" id="filterKeyword" placeholder="搜索技能名称或ID" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="btnSearchSkills" type="button" onclick="console.log('查询按钮被点击'); if(typeof searchSkills === 'function') searchSkills(); else console.error('searchSkills函数未定义');">
+                        <i class="ri-search-line"></i> 查询
+                    </button>
+                    <button class="btn btn-secondary" id="btnResetFilters" type="button" onclick="console.log('重置按钮被点击'); if(typeof resetFilters === 'function') resetFilters(); else console.error('resetFilters函数未定义');">
+                        <i class="ri-refresh-line"></i> 重置
+                    </button>
+                    <button class="btn btn-success" onclick="openAddSkillModal()">
+                        <i class="ri-add-line"></i> 添加技能
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 技能列表 -->
+            <div class="skills-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>技能ID</th>
+                            <th>技能名称</th>
+                            <th>分类</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skillTableBody">
+                        <!-- 技能数据将通过JavaScript动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加/编辑技能模态框 -->
+    <div id="skillModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加技能</h2>
+                <button class="close-btn" onclick="closeSkillModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="skillForm">
+                    <input type="hidden" id="skillId">
+                    <div class="form-group">
+                        <label for="skillName">技能名称</label>
+                        <input type="text" id="skillName" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="skillDescription">技能描述</label>
+                        <textarea id="skillDescription" required class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillCategory">技能分类</label>
+                        <select id="skillCategory" required class="form-control">
+                            <option value="text-processing">文本处理</option>
+                            <option value="development">开发工具</option>
+                            <option value="deployment">部署工具</option>
+                            <option value="media">媒体处理</option>
+                            <option value="storage">存储管理</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillStatus">技能状态</label>
+                        <select id="skillStatus" required class="form-control">
+                            <option value="active">活跃</option>
+                            <option value="pending">待审核</option>
+                            <option value="inactive">inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSkillModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveSkill()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/skill-management.js"></script>
+    <script>
+        // 测试脚本，确保函数已定义
+        console.log('[SkillManagement] HTML加载完成');
+        console.log('[SkillManagement] openAddSkillModal 类型:', typeof openAddSkillModal);
+        console.log('[SkillManagement] editSkill 类型:', typeof editSkill);
+        console.log('[SkillManagement] deleteSkill 类型:', typeof deleteSkill);
+        console.log('[SkillManagement] approveSkill 类型:', typeof approveSkill);
+        console.log('[SkillManagement] closeSkillModal 类型:', typeof closeSkillModal);
+        console.log('[SkillManagement] searchSkills 类型:', typeof searchSkills);
+        console.log('[SkillManagement] resetFilters 类型:', typeof resetFilters);
+    </script>
+</body>
+</html>

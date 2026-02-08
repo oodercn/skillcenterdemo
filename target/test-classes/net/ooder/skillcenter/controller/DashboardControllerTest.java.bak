@@ -1,0 +1,145 @@
+package net.ooder.skillcenter.controller;
+
+import net.ooder.skillcenter.manager.SkillManager;
+import net.ooder.skillcenter.market.SkillMarketManager;
+import net.ooder.skillcenter.model.ApiResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Collections;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+/**
+ * DashboardController 单元测试
+ */
+public class DashboardControllerTest {
+
+    private DashboardController dashboardController;
+    private SkillManager mockSkillManager;
+    private SkillMarketManager mockMarketManager;
+
+    @BeforeEach
+    public void setUp() {
+        // 创建模拟对象
+        mockSkillManager = Mockito.mock(SkillManager.class);
+        mockMarketManager = Mockito.mock(SkillMarketManager.class);
+
+        // 初始化控制器，注入模拟对象
+        dashboardController = new DashboardController(mockSkillManager, mockMarketManager);
+    }
+
+    /**
+     * 测试获取系统概览统计数据
+     */
+    @Test
+    public void testGetDashboardStats() {
+        // 模拟技能列表
+        when(mockSkillManager.getAllSkills()).thenReturn(Collections.emptyList());
+        when(mockMarketManager.getAllSkills()).thenReturn(Collections.emptyList());
+
+        // 调用API
+        ResponseEntity<ApiResponse<Map<String, Object>>> response = dashboardController.getDashboardStats();
+
+        // 验证响应状态码
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 验证响应数据
+        ApiResponse<Map<String, Object>> apiResponse = response.getBody();
+        assert apiResponse != null;
+        assertEquals(200, apiResponse.getCode());
+        assertEquals("success", apiResponse.getMessage());
+        assert apiResponse.getData() != null;
+        assertEquals(0, apiResponse.getData().get("totalSkills"));
+        assertEquals(0, apiResponse.getData().get("totalMarketSkills"));
+        assert apiResponse.getData().containsKey("systemInfo");
+        assert apiResponse.getData().containsKey("appInfo");
+    }
+
+    /**
+     * 测试获取技能执行统计数据
+     */
+    @Test
+    public void testGetExecutionStats() {
+        // 调用API
+        ResponseEntity<ApiResponse<Map<String, Object>>> response = dashboardController.getExecutionStats();
+
+        // 验证响应状态码
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 验证响应数据
+        ApiResponse<Map<String, Object>> apiResponse = response.getBody();
+        assert apiResponse != null;
+        assertEquals(200, apiResponse.getCode());
+        assertEquals("success", apiResponse.getMessage());
+        assert apiResponse.getData() != null;
+        assert apiResponse.getData().containsKey("totalExecutions");
+        assert apiResponse.getData().containsKey("successfulExecutions");
+        assert apiResponse.getData().containsKey("failedExecutions");
+        assert apiResponse.getData().containsKey("successRate");
+        assert apiResponse.getData().containsKey("averageExecutionTime");
+        assert apiResponse.getData().containsKey("topExecutedSkills");
+        assert apiResponse.getData().containsKey("executionTrend");
+    }
+
+    /**
+     * 测试获取市场活跃度统计数据
+     */
+    @Test
+    public void testGetMarketStats() {
+        // 模拟市场技能列表
+        when(mockMarketManager.getAllSkills()).thenReturn(Collections.emptyList());
+
+        // 调用API
+        ResponseEntity<ApiResponse<Map<String, Object>>> response = dashboardController.getMarketStats();
+
+        // 验证响应状态码
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 验证响应数据
+        ApiResponse<Map<String, Object>> apiResponse = response.getBody();
+        assert apiResponse != null;
+        assertEquals(200, apiResponse.getCode());
+        assertEquals("success", apiResponse.getMessage());
+        assert apiResponse.getData() != null;
+        assertEquals(0, apiResponse.getData().get("totalMarketSkills"));
+        assert apiResponse.getData().containsKey("totalDownloads");
+        assert apiResponse.getData().containsKey("totalReviews");
+        assert apiResponse.getData().containsKey("averageRating");
+        assert apiResponse.getData().containsKey("topDownloadedSkills");
+        assert apiResponse.getData().containsKey("marketTrend");
+        assert apiResponse.getData().containsKey("categoryDistribution");
+    }
+
+    /**
+     * 测试获取系统资源使用统计数据
+     */
+    @Test
+    public void testGetSystemStats() {
+        // 调用API
+        ResponseEntity<ApiResponse<Map<String, Object>>> response = dashboardController.getSystemStats();
+
+        // 验证响应状态码
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 验证响应数据
+        ApiResponse<Map<String, Object>> apiResponse = response.getBody();
+        assert apiResponse != null;
+        assertEquals(200, apiResponse.getCode());
+        assertEquals("success", apiResponse.getMessage());
+        assert apiResponse.getData() != null;
+        assert apiResponse.getData().containsKey("cpuUsage");
+        assert apiResponse.getData().containsKey("memoryUsage");
+        assert apiResponse.getData().containsKey("totalMemory");
+        assert apiResponse.getData().containsKey("usedMemory");
+        assert apiResponse.getData().containsKey("freeMemory");
+        assert apiResponse.getData().containsKey("systemLoad");
+        assert apiResponse.getData().containsKey("availableProcessors");
+        assert apiResponse.getData().containsKey("uptime");
+    }
+}

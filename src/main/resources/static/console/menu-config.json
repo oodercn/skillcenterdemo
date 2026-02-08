@@ -1,0 +1,250 @@
+{
+  "batch": 1,
+  "totalBatches": 3,
+  "description": "第一批次实现的核心功能",
+  "menu": [
+    {
+      "id": "dashboard",
+      "name": "仪表盘",
+      "icon": "ri-dashboard-line",
+      "page": "dashboard",
+      "url": "pages/dashboard.html",
+      "priority": "high",
+      "status": "implemented",
+      "roles": ["personal", "admin"]
+    },
+    {
+      "id": "personal-function",
+      "name": "个人中心",
+      "icon": "ri-user-line",
+      "page": "personal",
+      "priority": "high",
+      "status": "implemented",
+      "roles": ["personal"],
+      "children": [
+        {
+          "id": "personal-dashboard",
+          "name": "个人仪表盘",
+          "icon": "ri-dashboard-3-line",
+          "page": "personal-dashboard",
+          "url": "pages/personal/dashboard.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["personal"]
+        },
+        {
+          "id": "my-skills",
+          "name": "我的技能",
+          "icon": "ri-lightbulb-line",
+          "page": "my-skills",
+          "url": "pages/personal/my-skill.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["personal"]
+        },
+        {
+          "id": "my-execution",
+          "name": "执行管理",
+          "icon": "ri-play-circle-line",
+          "page": "my-execution",
+          "url": "pages/personal/my-execution.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["personal"]
+        },
+        {
+          "id": "my-sharing",
+          "name": "技能分享",
+          "icon": "ri-share-line",
+          "page": "my-sharing",
+          "url": "pages/personal/my-sharing.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["personal"]
+        },
+        {
+          "id": "my-groups",
+          "name": "我的群组",
+          "icon": "ri-group-line",
+          "page": "my-groups",
+          "url": "pages/personal/my-group.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["personal"]
+        },
+        {
+          "id": "my-identity",
+          "name": "个人身份",
+          "icon": "ri-id-card-line",
+          "page": "my-identity",
+          "url": "pages/personal/my-identity.html",
+          "priority": "medium",
+          "status": "implemented",
+          "roles": ["personal"]
+        },
+        {
+          "id": "my-help",
+          "name": "帮助与支持",
+          "icon": "ri-question-line",
+          "page": "my-help",
+          "url": "pages/personal/my-help.html",
+          "priority": "medium",
+          "status": "implemented",
+          "roles": ["personal"]
+        }
+      ]
+    },
+    {
+      "id": "market-function",
+      "name": "市场管理",
+      "icon": "ri-shopping-cart-line",
+      "page": "market",
+      "priority": "high",
+      "status": "implemented",
+      "roles": ["personal", "admin"],
+      "children": [
+        {
+          "id": "market-skills",
+          "name": "市场技能",
+          "icon": "ri-store-2-line",
+          "page": "market-skills",
+          "url": "pages/market.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["personal", "admin"]
+        },
+        {
+          "id": "skill-upload",
+          "name": "技能上传",
+          "icon": "ri-upload-line",
+          "page": "skill-upload",
+          "url": "pages/market.html",
+          "priority": "medium",
+          "status": "planned",
+          "roles": ["admin"]
+        },
+        {
+          "id": "skill-download",
+          "name": "技能下载",
+          "icon": "ri-download-line",
+          "page": "skill-download",
+          "url": "pages/market.html",
+          "priority": "medium",
+          "status": "planned",
+          "roles": ["personal", "admin"]
+        }
+      ]
+    },
+    {
+      "id": "admin-function",
+      "name": "管理中心",
+      "icon": "ri-admin-line",
+      "page": "admin",
+      "priority": "high",
+      "status": "implemented",
+      "roles": ["admin"],
+      "children": [
+        {
+          "id": "admin-dashboard",
+          "name": "管理仪表盘",
+          "icon": "ri-dashboard-line",
+          "page": "admin-dashboard",
+          "url": "pages/admin/dashboard.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "skill-management",
+          "name": "技能管理",
+          "icon": "ri-lightbulb-line",
+          "page": "skill-management",
+          "url": "pages/admin/skill-management.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "market-management",
+          "name": "市场管理",
+          "icon": "ri-shopping-cart-line",
+          "page": "market-management",
+          "url": "pages/admin/market-management.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "authentication-management",
+          "name": "技能认证",
+          "icon": "ri-shield-check-line",
+          "page": "authentication-management",
+          "url": "pages/admin/skill-authentication.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "group-management",
+          "name": "群组管理",
+          "icon": "ri-group-line",
+          "page": "group-management",
+          "url": "pages/admin/group-management.html",
+          "priority": "medium",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "remote-hosting",
+          "name": "远程托管",
+          "icon": "ri-cloud-line",
+          "page": "remote-hosting",
+          "url": "pages/admin/remote-hosting.html",
+          "priority": "medium",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "storage-management",
+          "name": "存储管理",
+          "icon": "ri-database-line",
+          "page": "storage-management",
+          "url": "pages/admin/storage-management.html",
+          "priority": "high",
+          "status": "implemented",
+          "roles": ["admin"]
+        },
+        {
+          "id": "system-management",
+          "name": "系统管理",
+          "icon": "ri-server-line",
+          "page": "system-management",
+          "url": "pages/admin/system-management.html",
+          "priority": "medium",
+          "status": "implemented",
+          "roles": ["admin"]
+        }
+      ]
+    }
+  ],
+  "futureBatches": [
+    {
+      "batch": 2,
+      "description": "第二批次实现的功能",
+      "priority": "medium",
+      "modules": [
+        "market",
+        "group"
+      ]
+    },
+    {
+      "batch": 3,
+      "description": "第三批次实现的功能",
+      "priority": "low",
+      "modules": [
+        "settings",
+        "help"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository>D:\maven\.m2\repository</localRepository>
+
+    <servers>
+        <server>
+            <id>maven-public</id>
+            <username>IhyTdX</username>
+            <password>58yfI0TpbzN6OWPZQgNdKfpKWERUsAN1z</password>
+        </server>
+        <!-- Maven 中央仓库部署配置 -->
+        <server>
+            <id>ossrh</id>
+            <username>ooderCN</username>
+            <password>IhyTdX:58yfI0TpbzN6OWPZQgNdKfpKWERUsAN1z</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <!-- JDK版本配置 -->
+        <profile>
+            <id>jdk-1.8</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <maven.compiler.source>1.8</maven.compiler.source>
+                <maven.compiler.target>1.8</maven.compiler.target>
+                <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+            </properties>
+        </profile>
+
+        <!-- GPG签名配置 -->
+        <profile>
+            <id>gpg</id>
+            <properties>
+                <!-- 可选：如果GPG需要密码，可以在这里配置 -->
+                <!-- <gpg.passphrase>你的GPG密钥密码</gpg.passphrase> -->
+            </properties>
+        </profile>
+
+        <!-- 可选：镜像配置，用于加速依赖下载 -->
+        <profile>
+            <id>mirror</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <!-- 激活配置文件 -->
+    <activeProfiles>
+        <activeProfile>jdk-1.8</activeProfile>
+        <activeProfile>gpg</activeProfile>
+        <activeProfile>mirror</activeProfile>
+    </activeProfiles>
+
+</settings>

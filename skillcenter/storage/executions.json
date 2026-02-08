@@ -1,0 +1,26 @@
+[
+	{
+		"executionId":"exec-12345",
+		"executionTime":"0.5s",
+		"skillId":"text-uppercase",
+		"skillName":"文本转大写",
+		"status":"SUCCESS",
+		"timestamp":"2026-02-08 13:22:07"
+	},
+	{
+		"executionId":"exec-12344",
+		"executionTime":"3.2s",
+		"skillId":"code-generation",
+		"skillName":"代码生成",
+		"status":"SUCCESS",
+		"timestamp":"2026-02-08 12:22:07"
+	},
+	{
+		"executionId":"exec-12343",
+		"executionTime":"1.8s",
+		"skillId":"local-deployment",
+		"skillName":"本地部署",
+		"status":"FAILED",
+		"timestamp":"2026-02-08 11:22:07"
+	}
+]

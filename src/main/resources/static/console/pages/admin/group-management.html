@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理中心 - 群组管理</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <!-- 菜单将通过menu.js动态加载 -->
+        </aside>
+        <main class="main-content" id="main-content">
+            <header class="header">
+                <h1>群组管理</h1>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <div class="admin-dashboard-content">
+                <!-- 筛选查询区域 -->
+                <div class="filter-section">
+                    <div class="filter-form">
+                        <div class="filter-row">
+                            <div class="filter-item filter-item-large">
+                                <label for="groupSearch">关键词</label>
+                                <input type="text" id="groupSearch" placeholder="搜索群组名称或ID" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-primary" id="btnSearchGroups" type="button" onclick="console.log('查询按钮被点击'); if(typeof searchGroups === 'function') searchGroups(); else console.error('searchGroups函数未定义');">
+                            <i class="ri-search-line"></i> 查询
+                        </button>
+                        <button class="btn btn-secondary" id="btnResetFilters" type="button" onclick="console.log('重置按钮被点击'); if(typeof resetFilters === 'function') resetFilters(); else console.error('resetFilters函数未定义');">
+                            <i class="ri-refresh-line"></i> 重置
+                        </button>
+                        <button class="btn btn-success" onclick="openAddGroupModal()">
+                            <i class="ri-add-line"></i> 新建
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 群组列表 -->
+                <div class="skills-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>群组ID</th>
+                                <th>群组名称</th>
+                                <th>描述</th>
+                                <th>成员数量</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="groupTableBody">
+                            <!-- 群组数据将通过JavaScript动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 群组详情 -->
+                <div class="system-info-card" id="groupDetails" style="display: none;">
+                    <h3>群组详情</h3>
+                    <div class="detail-section">
+                        <h4>基本信息</h4>
+                        <div id="basicInfo"></div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>成员列表</h4>
+                        <ul class="member-list" id="memberList"></ul>
+                    </div>
+                    <div class="detail-section">
+                        <h4>群组技能</h4>
+                        <ul class="member-list" id="groupSkills"></ul>
+                    </div>
+                    <button class="btn btn-secondary" onclick="hideGroupDetails()">关闭详情</button>
+                </div>
+            </div>
+    </main>
+
+    <!-- 添加/编辑群组模态框 -->
+    <div id="groupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">创建群组</h2>
+                <button class="close-btn" onclick="closeGroupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="groupForm">
+                    <input type="hidden" id="groupId">
+                    <div class="form-group">
+                        <label for="groupName">群组名称</label>
+                        <input type="text" id="groupName" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="groupDescription">群组描述</label>
+                        <textarea id="groupDescription" required class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeGroupModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveGroup()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/group-management.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[GroupManagement] DOM加载完成，开始初始化');
+            if (typeof initGroupManagementPage === 'function') {
+                initGroupManagementPage();
+            } else {
+                console.error('[GroupManagement] initGroupManagementPage 函数未定义');
+            }
+        });
+    </script>
+</main>
+    </div>
+</body>
+</html>

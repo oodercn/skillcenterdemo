@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理中心 - 远程托管</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/app.css">
+    <link href="/skillcenter/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <script src="/skillcenter/console/js/menu.js"></script>
+    <script src="/skillcenter/console/js/utils.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <!-- 菜单将通过menu.js动态加载 -->
+        </aside>
+        <main class="main-content" id="main-content">
+            <header class="header">
+                <h1>远程托管管理</h1>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <div class="admin-dashboard-content">
+        <!-- 统计卡片 -->
+        <div class="admin-stats-grid">
+            <div class="system-info-card">
+                <div class="value">12</div>
+                <div class="label">总托管实例</div>
+            </div>
+            <div class="system-info-card">
+                <div class="value">8</div>
+                <div class="label">运行中实例</div>
+            </div>
+            <div class="system-info-card">
+                <div class="value">4</div>
+                <div class="label">已停止实例</div>
+            </div>
+            <div class="system-info-card">
+                <div class="value">98%</div>
+                <div class="label">服务可用性</div>
+            </div>
+        </div>
+
+        <!-- 筛选查询区域 -->
+        <div class="filter-section">
+            <div class="filter-form">
+                <div class="filter-row">
+                    <div class="filter-item filter-item-large">
+                        <label for="hostingSearch">关键词</label>
+                        <input type="text" id="hostingSearch" placeholder="搜索托管实例名称或ID" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" id="btnSearchHosting" type="button" onclick="console.log('查询按钮被点击'); if(typeof searchHosting === 'function') searchHosting(); else console.error('searchHosting函数未定义');">
+                    <i class="ri-search-line"></i> 查询
+                </button>
+                <button class="btn btn-secondary" id="btnResetFilters" type="button" onclick="console.log('重置按钮被点击'); if(typeof resetFilters === 'function') resetFilters(); else console.error('resetFilters函数未定义');">
+                    <i class="ri-refresh-line"></i> 重置
+                </button>
+                <button class="btn btn-success" onclick="openAddHostingModal()">
+                    <i class="ri-server-add-line"></i> 添加托管
+                </button>
+            </div>
+        </div>
+
+        <!-- 托管实例列表 -->
+        <div class="hosting-list">
+            <table class="skills-table">
+                <thead>
+                    <tr>
+                        <th>实例ID</th>
+                        <th>实例名称</th>
+                        <th>技能ID</th>
+                        <th>状态</th>
+                        <th>部署时间</th>
+                        <th>运行时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="hostingTableBody">
+                    <!-- 托管实例数据将通过JavaScript动态填充 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 添加/编辑托管模态框 -->
+        <div id="hostingModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">添加托管实例</h3>
+                    <span class="close" onclick="closeHostingModal()">&times;</span>
+                </div>
+                <form id="hostingForm">
+                    <input type="hidden" id="hostingId">
+                    <div class="form-group">
+                        <label for="hostingName">实例名称</label>
+                        <input type="text" class="form-control" id="hostingName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillId">选择技能</label>
+                        <select class="form-control" id="skillId" required>
+                            <option value="">请选择技能</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hostingDescription">描述</label>
+                        <textarea class="form-control" id="hostingDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="hostingStatus">初始状态</label>
+                        <select class="form-control" id="hostingStatus" required>
+                            <option value="running">运行中</option>
+                            <option value="stopped">已停止</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeHostingModal()">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="submitHostingForm()">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/skillcenter/console/js/remote-hosting.js"></script>
+</main>
+    </div>
+</body>
+</html>

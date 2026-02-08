@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气API导入 - SkillCenter 控制台</title>
+    <link rel="stylesheet" href="/skillcenter/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/skillcenter/console/css/pages/weather-api-skill.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边导航栏 -->
+        <div class="sidebar">
+            <h2 style="display: flex; align-items: center; gap: 12px;"><i class="ri-cloud-sun-line"></i> 天气API导入</h2>
+            <ul class="nav-menu" id="nav-menu">
+                <li>
+                    <a href="#" class="active" onclick="switchTab('api-config')">
+                        <i class="ri-settings-3-line"></i>
+                        API配置
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchTab('skill-settings')">
+                        <i class="ri-code-box-line"></i>
+                        Skill设置
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchTab('preview-test')">
+                        <i class="ri-eye-line"></i>
+                        预览测试
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="switchTab('market-publish')">
+                        <i class="ri-upload-cloud-line"></i>
+                        发布到市场
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="header">
+                <h1><i class="ri-cloud-sun-line"></i> 天气API导入</h1>
+                <div class="subtitle">
+                    <span class="badge" style="background-color: var(--ooder-primary); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-right: 16px;">v1.0.0</span>
+                    <span>Ooder Rad Style</span> | 
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+            
+            <!-- API配置标签页 -->
+            <div id="api-config-tab" class="tab-content">
+                <div class="section">
+                    <h2>选择API提供商</h2>
+                    <div class="api-providers">
+                        <div class="api-provider" onclick="selectProvider('openweathermap')">
+                            <h4>OpenWeatherMap</h4>
+                            <p>全球天气数据，支持免费和付费计划</p>
+                            <div class="price">免费额度: 60次/分钟</div>
+                        </div>
+                        <div class="api-provider" onclick="selectProvider('weatherapi')">
+                            <h4>WeatherAPI.com</h4>
+                            <p>全球天气和地理编码服务</p>
+                            <div class="price">免费额度: 1,000次/天</div>
+                        </div>
+                        <div class="api-provider" onclick="selectProvider('accuweather')">
+                            <h4>AccuWeather</h4>
+                            <p>精确的全球天气预报</p>
+                            <div class="price">免费额度: 50次/天</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>API配置</h2>
+                    <form id="api-form">
+                        <div class="form-group">
+                            <label for="api-key">API密钥</label>
+                            <input type="password" id="api-key" placeholder="请输入API密钥" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="api-base-url">API基础URL</label>
+                            <input type="text" id="api-base-url" placeholder="请输入API基础URL" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">默认城市</label>
+                            <input type="text" id="city" placeholder="请输入默认城市" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="units">温度单位</label>
+                            <select id="units">
+                                <option value="metric">摄氏度 (°C)</option>
+                                <option value="imperial">华氏度 (°F)</option>
+                                <option value="standard">开尔文 (K)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="language">语言</label>
+                            <select id="language">
+                                <option value="zh_cn">简体中文</option>
+                                <option value="en">English</option>
+                                <option value="ja">日本語</option>
+                                <option value="ko">한국어</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="testApiConnection()">测试连接</button>
+                        <button type="button" class="btn btn-secondary" onclick="saveApiConfig()">保存配置</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Skill设置标签页 -->
+            <div id="skill-settings-tab" class="tab-content hidden">
+                <div class="section">
+                    <h2>Skill基本信息</h2>
+                    <form id="skill-form">
+                        <div class="form-group">
+                            <label for="skill-name">Skill名称</label>
+                            <input type="text" id="skill-name" placeholder="请输入Skill名称" value="天气查询" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="skill-description">Skill描述</label>
+                            <textarea id="skill-description" placeholder="请输入Skill描述">基于第三方API的天气查询技能，可以获取全球城市的实时天气信息。</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="skill-version">版本</label>
+                            <input type="text" id="skill-version" placeholder="请输入版本号" value="1.0.0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="skill-category">分类</label>
+                            <select id="skill-category">
+                                <option value="weather">天气</option>
+                                <option value="utility">实用工具</option>
+                                <option value="information">信息查询</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="skill-author">作者</label>
+                            <input type="text" id="skill-author" placeholder="请输入作者名称" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="saveSkillSettings()">保存设置</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 预览测试标签页 -->
+            <div id="preview-test-tab" class="tab-content hidden">
+                <div class="section">
+                    <h2>天气预览</h2>
+                    <div id="weather-preview" class="card">
+                        <h3>北京天气</h3>
+                        <p>加载中...</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="testWeatherApi()">测试API</button>
+                </div>
+                
+                <div class="section">
+                    <h2>Skill测试</h2>
+                    <div class="card">
+                        <h3>测试命令</h3>
+                        <p>天气北京</p>
+                        <p>查询上海天气</p>
+                        <p>今天天气怎么样</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 发布到市场标签页 -->
+            <div id="market-publish-tab" class="tab-content hidden">
+                <div class="section">
+                    <h2>发布设置</h2>
+                    <form id="publish-form">
+                        <div class="form-group">
+                            <label for="publish-title">发布标题</label>
+                            <input type="text" id="publish-title" placeholder="请输入发布标题" value="天气查询Skill" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="publish-description">发布描述</label>
+                            <textarea id="publish-description" placeholder="请输入发布描述">一个功能强大的天气查询Skill，支持全球城市的实时天气信息查询，基于可靠的第三方天气API。</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="publish-tags">标签</label>
+                            <input type="text" id="publish-tags" placeholder="请输入标签，用逗号分隔" value="weather,utility,information">
+                        </div>
+                        <div class="form-group">
+                            <label for="publish-price">价格</label>
+                            <select id="publish-price">
+                                <option value="free">免费</option>
+                                <option value="paid">付费</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="publishToMarket()">发布到市场</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/skillcenter/console/js/weather-api-skill.js"></script>
+</body>
+</html>
