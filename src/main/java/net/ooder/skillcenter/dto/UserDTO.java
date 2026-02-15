@@ -18,6 +18,8 @@ public class UserDTO {
     private Date updatedAt;
     private String status;
     private String role;
+    private String displayName;
+    private boolean active;
 
     public UserDTO() {}
 
@@ -54,4 +56,10 @@ public class UserDTO {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

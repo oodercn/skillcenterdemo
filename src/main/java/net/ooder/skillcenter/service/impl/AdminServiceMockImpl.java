@@ -133,8 +133,7 @@ public class AdminServiceMockImpl implements AdminService {
         hosting.setName(name);
         hosting.setSkillId(skillId);
         hosting.setStatus(status);
-        hosting.setDeployedAt(new Date());
-        hosting.setUptime(status.equals("running") ? "2d 5h 30m" : "-");
+        hosting.setCreatedAt(new Date());
         hostingStore.put(id, hosting);
     }
 
@@ -475,7 +474,7 @@ public class AdminServiceMockImpl implements AdminService {
     public HostingInstanceDTO createHostingInstance(HostingInstanceDTO instance) {
         String id = "hosting-" + idGenerator.getAndIncrement();
         instance.setId(id);
-        instance.setDeployedAt(new Date());
+        instance.setCreatedAt(new Date());
         hostingStore.put(id, instance);
         return instance;
     }
@@ -499,7 +498,8 @@ public class AdminServiceMockImpl implements AdminService {
         HostingInstanceDTO instance = hostingStore.get(instanceId);
         if (instance != null) {
             instance.setStatus("running");
-            instance.setUptime("0d 0h 0m");
+            instance.setCurrentInstances(1);
+            instance.setHealthStatus("healthy");
         }
         return instance;
     }
@@ -509,7 +509,8 @@ public class AdminServiceMockImpl implements AdminService {
         HostingInstanceDTO instance = hostingStore.get(instanceId);
         if (instance != null) {
             instance.setStatus("stopped");
-            instance.setUptime("-");
+            instance.setCurrentInstances(0);
+            instance.setHealthStatus("unknown");
         }
         return instance;
     }

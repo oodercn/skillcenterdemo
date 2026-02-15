@@ -98,6 +98,16 @@ public class SdkConfig {
      */
     private int heartbeatLossThreshold = 3;
 
+    /**
+     * SDK 0.7.0 - 技能存储基础路径
+     */
+    private String basePath = "./skillcenter";
+
+    /**
+     * SDK 0.7.0 - SkillCenter服务URL
+     */
+    private String skillCenterUrl = "https://skillcenter.ooder.net";
+
     // ==================== Getters and Setters ====================
 
     public String getMode() {
@@ -248,5 +258,28 @@ public class SdkConfig {
      */
     public boolean isRealMode() {
         return "real".equalsIgnoreCase(mode);
+    }
+
+    /**
+     * 检查是否为SDK 0.7.0模式
+     */
+    public boolean isSdkMode() {
+        return "sdk".equalsIgnoreCase(mode);
+    }
+
+    public String getBasePath() {
+        return basePath;
+    }
+
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
+    }
+
+    public String getSkillCenterUrl() {
+        return skillCenterUrl;
+    }
+
+    public void setSkillCenterUrl(String skillCenterUrl) {
+        this.skillCenterUrl = skillCenterUrl;
     }
 }

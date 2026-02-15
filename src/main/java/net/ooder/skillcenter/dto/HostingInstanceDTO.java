@@ -3,32 +3,47 @@ package net.ooder.skillcenter.dto;
 import java.util.Date;
 
 /**
- * 托管实例数据传输对象
+ * 托管实例DTO - 符合v0.7.0协议规范
  */
 public class HostingInstanceDTO {
-
+    
     private String id;
     private String name;
     private String skillId;
     private String skillName;
     private String status;
-    private Date deployedAt;
-    private String uptime;
-    private String description;
-    private String url;
+    private String endpoint;
+    private String host;
     private int port;
-    private String version;
+    private String protocol;
+    private String deploymentMode;
+    private int maxInstances;
+    private int currentInstances;
+    private double cpuLimit;
+    private long memoryLimit;
+    private Date createdAt;
+    private Date updatedAt;
+    private Date lastHeartbeat;
+    private String healthStatus;
+    private String owner;
+    private String description;
 
     public HostingInstanceDTO() {}
 
-    public HostingInstanceDTO(String id, String name, String skillId, String status) {
-        this.id = id;
-        this.name = name;
-        this.skillId = skillId;
-        this.status = status;
+    public static HostingInstanceDTO of(String id, String name, String skillId) {
+        HostingInstanceDTO dto = new HostingInstanceDTO();
+        dto.setId(id);
+        dto.setName(name);
+        dto.setSkillId(skillId);
+        dto.setStatus("stopped");
+        dto.setDeploymentMode("local-deployed");
+        dto.setMaxInstances(1);
+        dto.setCurrentInstances(0);
+        dto.setHealthStatus("unknown");
+        dto.setCreatedAt(new Date());
+        return dto;
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -44,21 +59,48 @@ public class HostingInstanceDTO {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public Date getDeployedAt() { return deployedAt; }
-    public void setDeployedAt(Date deployedAt) { this.deployedAt = deployedAt; }
+    public String getEndpoint() { return endpoint; }
+    public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
 
-    public String getUptime() { return uptime; }
-    public void setUptime(String uptime) { this.uptime = uptime; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
+    public String getHost() { return host; }
+    public void setHost(String host) { this.host = host; }
 
     public int getPort() { return port; }
     public void setPort(int port) { this.port = port; }
 
-    public String getVersion() { return version; }
-    public void setVersion(String version) { this.version = version; }
+    public String getProtocol() { return protocol; }
+    public void setProtocol(String protocol) { this.protocol = protocol; }
+
+    public String getDeploymentMode() { return deploymentMode; }
+    public void setDeploymentMode(String deploymentMode) { this.deploymentMode = deploymentMode; }
+
+    public int getMaxInstances() { return maxInstances; }
+    public void setMaxInstances(int maxInstances) { this.maxInstances = maxInstances; }
+
+    public int getCurrentInstances() { return currentInstances; }
+    public void setCurrentInstances(int currentInstances) { this.currentInstances = currentInstances; }
+
+    public double getCpuLimit() { return cpuLimit; }
+    public void setCpuLimit(double cpuLimit) { this.cpuLimit = cpuLimit; }
+
+    public long getMemoryLimit() { return memoryLimit; }
+    public void setMemoryLimit(long memoryLimit) { this.memoryLimit = memoryLimit; }
+
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    public Date getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+
+    public Date getLastHeartbeat() { return lastHeartbeat; }
+    public void setLastHeartbeat(Date lastHeartbeat) { this.lastHeartbeat = lastHeartbeat; }
+
+    public String getHealthStatus() { return healthStatus; }
+    public void setHealthStatus(String healthStatus) { this.healthStatus = healthStatus; }
+
+    public String getOwner() { return owner; }
+    public void setOwner(String owner) { this.owner = owner; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

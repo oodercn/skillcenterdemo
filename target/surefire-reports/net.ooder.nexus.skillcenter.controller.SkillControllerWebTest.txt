@@ -1,0 +1,9 @@
+-------------------------------------------------------------------------------
+Test set: net.ooder.nexus.skillcenter.controller.SkillControllerWebTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 15.184 s <<< FAILURE! - in net.ooder.nexus.skillcenter.controller.SkillControllerWebTest
+testGetAllSkills  Time elapsed: 0.049 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.data.items"
+	at net.ooder.nexus.skillcenter.controller.SkillControllerWebTest.testGetAllSkills(SkillControllerWebTest.java:90)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['data']['items']
+

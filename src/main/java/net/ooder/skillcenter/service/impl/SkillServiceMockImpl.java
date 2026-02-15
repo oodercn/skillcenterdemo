@@ -190,6 +190,33 @@ public class SkillServiceMockImpl implements SkillService {
         return marketSkillStore.remove(skillId) != null;
     }
 
+    @Override
+    public int getSkillCount() {
+        return skillStore.size();
+    }
+
+    @Override
+    public int getExecutionCount() {
+        return 150;
+    }
+
+    @Override
+    public int getSuccessfulExecutionCount() {
+        return 120;
+    }
+
+    @Override
+    public int getFailedExecutionCount() {
+        return 30;
+    }
+
+    @Override
+    public int getSharedSkillCount() {
+        return (int) skillStore.values().stream()
+            .filter(skill -> Boolean.TRUE.equals(skill.isAvailable()))
+            .count();
+    }
+
     private PageResult<SkillDTO> paginate(List<SkillDTO> list, int pageNum, int pageSize) {
         int total = list.size();
         int start = (pageNum - 1) * pageSize;

@@ -153,4 +153,39 @@ public class SkillServiceSdkImpl implements SkillService {
         restTemplate.delete(url, skillId);
         return true;
     }
+
+    @Override
+    public int getSkillCount() {
+        String url = getBaseUrl() + "/api/skills/count";
+        Integer count = restTemplate.getForObject(url, Integer.class);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public int getExecutionCount() {
+        String url = getBaseUrl() + "/api/executions/count";
+        Integer count = restTemplate.getForObject(url, Integer.class);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public int getSuccessfulExecutionCount() {
+        String url = getBaseUrl() + "/api/executions/count/successful";
+        Integer count = restTemplate.getForObject(url, Integer.class);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public int getFailedExecutionCount() {
+        String url = getBaseUrl() + "/api/executions/count/failed";
+        Integer count = restTemplate.getForObject(url, Integer.class);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public int getSharedSkillCount() {
+        String url = getBaseUrl() + "/api/skills/count/shared";
+        Integer count = restTemplate.getForObject(url, Integer.class);
+        return count != null ? count : 0;
+    }
 }

@@ -1,0 +1,9 @@
+-------------------------------------------------------------------------------
+Test set: net.ooder.nexus.skillcenter.controller.StorageControllerWebTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 7.812 s <<< FAILURE! - in net.ooder.nexus.skillcenter.controller.StorageControllerWebTest
+testGetBackupList  Time elapsed: 0.075 s  <<< FAILURE!
+java.lang.AssertionError: No value at JSON path "$.data.items"
+	at net.ooder.nexus.skillcenter.controller.StorageControllerWebTest.testGetBackupList(StorageControllerWebTest.java:78)
+Caused by: com.jayway.jsonpath.PathNotFoundException: No results for path: $['data']['items']
+

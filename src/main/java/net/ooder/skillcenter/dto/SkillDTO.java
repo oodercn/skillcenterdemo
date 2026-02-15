@@ -1,9 +1,10 @@
 package net.ooder.skillcenter.dto;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * 技能数据传输对象
+ * 技能数据传输对象 - 符合v0.7.0协议规范
  */
 public class SkillDTO {
     
@@ -20,6 +21,13 @@ public class SkillDTO {
     private int downloadCount;
     private double rating;
     
+    private String type;
+    private List<String> capabilities;
+    private List<String> scenes;
+    private String endpoint;
+    private String downloadUrl;
+    private String license;
+    
     public SkillDTO() {}
     
     public SkillDTO(String id, String name, String description, String category, String status) {
@@ -30,7 +38,6 @@ public class SkillDTO {
         this.status = status;
     }
     
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     
@@ -66,4 +73,22 @@ public class SkillDTO {
     
     public double getRating() { return rating; }
     public void setRating(double rating) { this.rating = rating; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public List<String> getCapabilities() { return capabilities; }
+    public void setCapabilities(List<String> capabilities) { this.capabilities = capabilities; }
+
+    public List<String> getScenes() { return scenes; }
+    public void setScenes(List<String> scenes) { this.scenes = scenes; }
+
+    public String getEndpoint() { return endpoint; }
+    public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
+
+    public String getDownloadUrl() { return downloadUrl; }
+    public void setDownloadUrl(String downloadUrl) { this.downloadUrl = downloadUrl; }
+
+    public String getLicense() { return license; }
+    public void setLicense(String license) { this.license = license; }
 }

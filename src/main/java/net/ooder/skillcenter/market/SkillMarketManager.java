@@ -219,7 +219,7 @@ public class SkillMarketManager {
     }
     
     /**
-     * 创建模拟技能列表项
+     * 创建模拟技能列表项 - 符合v0.7.0协议规范
      */
     private SkillListing createMockSkillListing(String id, String name, String description, 
                                                String category, String version, String url) {
@@ -236,7 +236,64 @@ public class SkillMarketManager {
         listing.setReviewCount(50);
         listing.setLastUpdated(System.currentTimeMillis());
         
+        String type = inferSkillType(category);
+        listing.setType(type);
+        listing.setCapabilities(generateCapabilities(category));
+        listing.setScenes(generateScenes(type));
+        listing.setEndpoint("https://skillcenter.ooder.net/skills/" + id);
+        listing.setHomepage("https://github.com/ooder/" + id);
+        listing.setRepository("https://github.com/ooder/" + id + ".git");
+        listing.setLicense("Apache-2.0");
+        
         return listing;
+    }
+    
+    private String inferSkillType(String category) {
+        if ("development".equals(category) || "ai".equals(category)) {
+            return "tool-skill";
+        } else if ("iot".equals(category) || "storage".equals(category)) {
+            return "infrastructure-skill";
+        } else if ("finance".equals(category) || "education".equals(category) || "health".equals(category)) {
+            return "enterprise-skill";
+        }
+        return "tool-skill";
+    }
+    
+    private java.util.List<String> generateCapabilities(String category) {
+        java.util.List<String> caps = new java.util.ArrayList<>();
+        if ("development".equals(category)) {
+            caps.add("code-generation");
+            caps.add("code-analysis");
+        } else if ("ai".equals(category)) {
+            caps.add("data-analysis");
+            caps.add("prediction");
+        } else if ("iot".equals(category)) {
+            caps.add("device-control");
+            caps.add("data-collection");
+        } else if ("storage".equals(category)) {
+            caps.add("file-read");
+            caps.add("file-write");
+        } else if ("finance".equals(category)) {
+            caps.add("org-data-read");
+            caps.add("user-auth");
+        } else {
+            caps.add("data-processing");
+        }
+        return caps;
+    }
+    
+    private java.util.List<String> generateScenes(String type) {
+        java.util.List<String> scenes = new java.util.ArrayList<>();
+        if ("enterprise-skill".equals(type)) {
+            scenes.add("auth");
+            scenes.add("messaging");
+        } else if ("infrastructure-skill".equals(type)) {
+            scenes.add("storage");
+            scenes.add("network");
+        } else {
+            scenes.add("processing");
+        }
+        return scenes;
     }
     
     /**
@@ -408,6 +465,14 @@ public class SkillMarketManager {
      */
     public List<SkillListing> getAllSkills() {
         return new java.util.ArrayList<>(skillListings.values());
+    }
+    
+    /**
+     * 获取技能总数
+     * @return 技能总数
+     */
+    public int getSkillCount() {
+        return skillListings.size();
     }
     
     /**

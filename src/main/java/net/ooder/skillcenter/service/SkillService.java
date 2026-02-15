@@ -64,4 +64,29 @@ public interface SkillService {
      * 移除市场技能
      */
     boolean removeMarketSkill(String skillId);
+    
+    /**
+     * 获取技能总数
+     */
+    int getSkillCount();
+    
+    /**
+     * 获取执行总数
+     */
+    int getExecutionCount();
+    
+    /**
+     * 获取成功执行数
+     */
+    int getSuccessfulExecutionCount();
+    
+    /**
+     * 获取失败执行数
+     */
+    int getFailedExecutionCount();
+    
+    /**
+     * 获取共享技能数
+     */
+    int getSharedSkillCount();
 }
