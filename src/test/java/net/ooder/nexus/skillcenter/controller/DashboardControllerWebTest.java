@@ -66,7 +66,8 @@ class DashboardControllerWebTest {
     }
 
     /**
-     * 测试获取技能执行统计数�?     */
+     * 测试获取技能执行统计数据
+     */
     @Test
     void testGetExecutionStats() throws Exception {
         ResultActions resultActions = mockMvc.perform(post("/api/dashboard/execution-stats")
@@ -87,7 +88,8 @@ class DashboardControllerWebTest {
     }
 
     /**
-     * 测试获取市场活跃度统计数�?     */
+     * 测试获取市场活跃度统计数据
+     */
     @Test
     void testGetMarketStats() throws Exception {
         ResultActions resultActions = mockMvc.perform(post("/api/dashboard/market-stats")
