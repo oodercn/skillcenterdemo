@@ -15,13 +15,13 @@
     <artifactId>agent-skillcenter</artifactId>
     <version>2.1</version>
     <name>Agent Skill Center</name>
-    <description>Skill Center for Ooder Super Agent - Version 2.1 with v0.7.0 Protocol Support</description>
+    <description>Skill Center for Ooder Super Agent - Version 2.2 with v0.7.1 Protocol Support</description>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fastjson.version>1.2.83</fastjson.version>
-        <agent-sdk.version>0.7.0</agent-sdk.version>
+        <agent-sdk.version>0.7.1</agent-sdk.version>
         <ooder-core.version>2.0</ooder-core.version>
     </properties>
 
@@ -53,7 +53,7 @@
             <artifactId>agent-sdk</artifactId>
             <version>${agent-sdk.version}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/agent-sdk-0.7.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/agent-sdk-0.7.1.jar</systemPath>
         </dependency>
         
         <dependency>

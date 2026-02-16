@@ -27,6 +27,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\Authenti
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\dashboard\DashboardStatsDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\market\DownloadResultDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\PersonalService.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\controller\SceneGroupController.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\common\PaginationDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\config\MarketConfig.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\scene\model\SecurityPolicy.java
@@ -79,6 +80,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\config\model\Val
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\controller\SkillDiscoveryController.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\dashboard\MarketStatsDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\PageResult.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\SceneGroupConfigDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\model\impl\LocalDeploymentSkill.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\p2p\refresh\impl\SkillsAgentRefreshEngineImpl.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\system\SystemOperationDTO.java
@@ -124,6 +126,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\controller
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\impl\HostingServiceMockImpl.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\identity\DecentralizedIdentityManager.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\security\SecurityKeyListCommand.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\VfsPermissionDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\ide\SkillAnalysisResult.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\scene\SceneManager.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\GroupDTO.java
@@ -148,6 +151,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\config\WebConfig
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\manager\HostingManager.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\model\impl\TextToUppercaseSkill.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\execution\ExecuteSkillRequestDTO.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\SceneGroupKeyDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\HelpCommand.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\system\SystemLogDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\p2p\refresh\SkillsAgentRefreshEngine.java
@@ -167,6 +171,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\Executio
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\impl\AuthenticationServiceSdk070Impl.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\personalai\DataSyncManager.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\skill\SkillManifestDTO.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\SceneMemberDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\SkillShareDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\lifecycle\traffic\impl\TrafficControlManagerImpl.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\lifecycle\deployment\StartupManager.java
@@ -190,6 +195,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\impl\Mar
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\controller\SystemController.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\market\RateRequestDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\storage\CleanBackupsResultDTO.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\impl\SceneGroupServiceMockImpl.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\security\SecurityKeyInfoCommand.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\CommandRegistry.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\p2p\P2PEventType.java
@@ -241,10 +247,12 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\distribution\Ski
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\runtime\RuntimeExecutor.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\storage\StorageService.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\market\SkillStorage.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\FailoverStatusDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\manager\StorageManager.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\controller\MenuController.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\exception\BusinessException.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\runtime\impl\NodeRuntimeExecutor.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\KeyShareDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\MarketDownloadCommand.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\capability\CapabilityRegistry.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\lifecycle\execution\impl\SkillExecutionManagerImpl.java
@@ -267,6 +275,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\SkillUpdat
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\storage\StorageStatusDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\SkillService.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\model\GroupMember.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\service\SceneGroupService.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\dto\p2p\P2PEventDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\shell\p2p\P2PInfoCommand.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\storage\JsonStorageService.java
@@ -281,6 +290,7 @@ E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\skill\SkillM
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\HostingInstanceDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\nexus\skillcenter\controller\ShareController.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\model\GroupSkill.java
+E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\dto\scene\SceneGroupDTO.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\lifecycle\deployment\model\StartupConfig.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\model\Group.java
 E:\github\agent-skillcenter\src\main\java\net\ooder\skillcenter\capability\model\CapabilityReturn.java
