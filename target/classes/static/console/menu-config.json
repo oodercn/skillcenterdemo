@@ -163,6 +163,13 @@
           "roles": ["admin"]
         },
         {
+          "id": "admin-scene-group-management",
+          "name": "场景组管理",
+          "icon": "ri-node-tree",
+          "url": "pages/admin/scene-group-management.html",
+          "roles": ["admin"]
+        },
+        {
           "id": "admin-remote-hosting",
           "name": "远程托管",
           "icon": "ri-cloud-line",

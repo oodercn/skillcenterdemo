@@ -20,6 +20,7 @@ public class UserDTO {
     private String role;
     private String displayName;
     private boolean active;
+    private String groupId;
 
     public UserDTO() {}
 
@@ -62,4 +63,7 @@ public class UserDTO {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public String getGroupId() { return groupId; }
+    public void setGroupId(String groupId) { this.groupId = groupId; }
 }

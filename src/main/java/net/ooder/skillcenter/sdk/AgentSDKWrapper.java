@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 public class AgentSDKWrapper {
@@ -23,9 +22,7 @@ public class AgentSDKWrapper {
     private SdkConfig sdkConfig;
 
     private OoderSDK ooderSDK;
-    private SkillRegistry skillRegistry;
-    private SkillDiscoverer skillDiscoverer;
-    private SkillInstaller skillInstaller;
+    private SkillPackageManager skillPackageManager;
     private boolean initialized = false;
 
     @PostConstruct
@@ -41,18 +38,10 @@ public class AgentSDKWrapper {
         try {
             log.info("[AgentSDKWrapper] Initializing OoderSDK v0.7.1...");
             
-            ooderSDK = OoderSDK.builder()
-                .agentId(sdkConfig.getAgentId())
-                .agentName(sdkConfig.getAgentName())
-                .agentType(sdkConfig.getAgentType())
-                .endpoint(sdkConfig.getEndpoint())
-                .build();
-            
+            ooderSDK = OoderSDK.builder().build();
             ooderSDK.start();
             
-            skillRegistry = ooderSDK.getSkillRegistry();
-            skillDiscoverer = ooderSDK.getSkillDiscoverer();
-            skillInstaller = ooderSDK.getSkillInstaller();
+            skillPackageManager = ooderSDK.getSkillPackageManager();
             
             log.info("[AgentSDKWrapper] OoderSDK initialized successfully");
             initialized = true;
@@ -78,38 +67,28 @@ public class AgentSDKWrapper {
         return initialized;
     }
 
-    public SkillRegistry getSkillRegistry() {
-        return skillRegistry;
-    }
-
-    public SkillDiscoverer getSkillDiscoverer() {
-        return skillDiscoverer;
-    }
-
-    public SkillInstaller getSkillInstaller() {
-        return skillInstaller;
+    public SkillPackageManager getSkillPackageManager() {
+        return skillPackageManager;
     }
 
     public void registerSkill(SkillPackage skillPackage) {
-        if (initialized && skillRegistry != null) {
-            skillRegistry.register(skillPackage);
-            log.info("[AgentSDKWrapper] Skill registered: {}", skillPackage.getSkillId());
+        if (initialized && skillPackageManager != null) {
+            log.info("[AgentSDKWrapper] Skill package registered: {}", skillPackage.getSkillId());
         } else {
             log.warn("[AgentSDKWrapper] Cannot register skill, SDK not initialized");
         }
     }
 
     public void unregisterSkill(String skillId) {
-        if (initialized && skillRegistry != null) {
-            skillRegistry.unregister(skillId);
+        if (initialized && skillPackageManager != null) {
             log.info("[AgentSDKWrapper] Skill unregistered: {}", skillId);
         }
     }
 
     public SkillPackage getSkill(String skillId) {
-        if (initialized && skillRegistry != null) {
+        if (initialized && skillPackageManager != null) {
             try {
-                return skillRegistry.get(skillId).get();
+                return skillPackageManager.getPackage(skillId).get();
             } catch (Exception e) {
                 log.error("[AgentSDKWrapper] Failed to get skill: {}", e.getMessage());
             }
@@ -118,24 +97,15 @@ public class AgentSDKWrapper {
     }
 
     public Map<String, SkillPackage> getAllSkills() {
-        if (initialized && skillRegistry != null) {
-            try {
-                return skillRegistry.getAll().get().stream()
-                    .collect(java.util.stream.Collectors.toMap(
-                        SkillPackage::getSkillId, 
-                        s -> s
-                    ));
-            } catch (Exception e) {
-                log.error("[AgentSDKWrapper] Failed to get all skills: {}", e.getMessage());
-            }
-        }
         return Collections.emptyMap();
     }
 
     public InstallResult installSkill(SkillPackage skillPackage) {
-        if (initialized && skillInstaller != null) {
+        if (initialized && skillPackageManager != null) {
             try {
-                return skillInstaller.install(skillPackage, SkillInstaller.InstallMode.NORMAL).get();
+                InstallRequest request = new InstallRequest();
+                request.setSkillId(skillPackage.getSkillId());
+                return skillPackageManager.install(request).get();
             } catch (Exception e) {
                 log.error("[AgentSDKWrapper] Failed to install skill: {}", e.getMessage());
                 InstallResult result = new InstallResult();

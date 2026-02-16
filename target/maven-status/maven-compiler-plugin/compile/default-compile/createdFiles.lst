@@ -1,6 +1,7 @@
 net\ooder\skillcenter\lifecycle\execution\SkillExecutionManager.class
 net\ooder\skillcenter\service\impl\SystemServiceMockImpl.class
 net\ooder\nexus\skillcenter\controller\MarketController.class
+net\ooder\skillcenter\shell\lifecycle\SkillTrafficCommand.class
 net\ooder\nexus\skillcenter\controller\ExecutionController$1.class
 net\ooder\nexus\skillcenter\dto\p2p\ConnectResultDTO.class
 net\ooder\skillcenter\shell\SkillCategoriesCommand.class
@@ -13,6 +14,7 @@ net\ooder\skillcenter\personalai\PersonalAIStatus.class
 net\ooder\nexus\skillcenter\dto\personal\UserSettingsDTO$NotificationSettingsDTO.class
 net\ooder\skillcenter\ide\TestingPlugin.class
 net\ooder\nexus\skillcenter\dto\p2p\ConnectRequestDTO.class
+net\ooder\skillcenter\shell\ExecuteRunCommand.class
 net\ooder\nexus\skillcenter\NexusSkillCenterApplication.class
 net\ooder\skillcenter\security\service\KeyManagementService.class
 net\ooder\skillcenter\lifecycle\registration\SkillRegistrationManager$SkillRegistrationInfo.class
@@ -21,6 +23,7 @@ net\ooder\nexus\skillcenter\controller\MenuController.class
 net\ooder\skillcenter\lifecycle\execution\impl\SkillExecutionManagerImpl.class
 net\ooder\skillcenter\service\GroupService.class
 net\ooder\skillcenter\shell\StorageStatsCommand.class
+net\ooder\skillcenter\shell\lifecycle\SkillUpdateCommand.class
 net\ooder\nexus\skillcenter\dto\dashboard\DashboardStatsDTO$SystemInfoDTO.class
 net\ooder\nexus\skillcenter\dto\admin\AuthStatusUpdateDTO.class
 net\ooder\nexus\skillcenter\dto\skill\SkillManifestDTO$Deployment.class
@@ -49,6 +52,7 @@ net\ooder\nexus\skillcenter\dto\personal\FeatureFlagsDTO.class
 net\ooder\skillcenter\dto\GroupSkillDTO.class
 net\ooder\nexus\skillcenter\dto\storage\StorageStatsDTO.class
 net\ooder\nexus\skillcenter\dto\skill\SkillManifestDTO$Returns.class
+net\ooder\skillcenter\model\Pageable.class
 net\ooder\skillcenter\p2p\P2PEventType.class
 net\ooder\nexus\skillcenter\dto\common\PaginationDTO.class
 net\ooder\skillcenter\shell\SkillPublishCommand.class
@@ -71,6 +75,7 @@ net\ooder\nexus\skillcenter\dto\market\DownloadResultDTO.class
 net\ooder\nexus\skillcenter\dto\storage\StorageSettingsDTO$BackupSettingsDTO.class
 net\ooder\nexus\skillcenter\dto\storage\CleanBackupsResultDTO.class
 net\ooder\skillcenter\shell\ExecuteHistoryCommand.class
+net\ooder\skillcenter\shell\SkillListCommand.class
 net\ooder\nexus\skillcenter\dto\personal\UserSettingsDTO$PrivacySettingsDTO.class
 net\ooder\skillcenter\security\service\KeyManagementService$KeyInfo.class
 net\ooder\skillcenter\model\SkillResult.class
@@ -78,12 +83,16 @@ net\ooder\nexus\skillcenter\dto\system\SystemVersionDTO.class
 net\ooder\skillcenter\sdk\SkillCenterSdk.class
 net\ooder\nexus\skillcenter\dto\admin\SkillQueryDTO.class
 net\ooder\skillcenter\model\impl\GenericSkill.class
+net\ooder\skillcenter\shell\MarketDownloadCommand.class
 net\ooder\nexus\skillcenter\dto\system\SystemResourcesDTO.class
 net\ooder\skillcenter\shell\security\SecurityKeyGenerateCommand.class
 net\ooder\skillcenter\execution\SkillExecutionMonitor$SkillStat.class
+net\ooder\skillcenter\shell\SystemStatusCommand.class
 net\ooder\skillcenter\security\service\KeyManagementService$KeyAuditLog.class
 net\ooder\skillcenter\service\impl\SkillServiceMockImpl.class
 net\ooder\skillcenter\lifecycle\traffic\impl\TrafficControlManagerImpl.class
+net\ooder\skillcenter\service\impl\MarketServiceMockImpl.class
+net\ooder\nexus\skillcenter\service\BaseService.class
 net\ooder\skillcenter\p2p\refresh\SkillsAgentRefreshEngine.class
 net\ooder\skillcenter\personalai\DeviceManager.class
 net\ooder\nexus\skillcenter\dto\market\DownloadRequestDTO.class
@@ -96,6 +105,7 @@ net\ooder\skillcenter\storage\StorageStatus.class
 net\ooder\nexus\skillcenter\dto\skill\SkillManifestDTO$Parameter.class
 net\ooder\skillcenter\p2p\refresh\impl\SkillsAgentRefreshEngineImpl.class
 net\ooder\skillcenter\market\SkillListing.class
+net\ooder\skillcenter\shell\MarketReviewsCommand.class
 net\ooder\skillcenter\service\AdminService.class
 net\ooder\nexus\skillcenter\dto\personal\PersonalDashboardStatsDTO$ActivityDTO.class
 net\ooder\nexus\skillcenter\dto\PageResult.class
@@ -114,8 +124,11 @@ net\ooder\skillcenter\shell\StorageStatusCommand.class
 net\ooder\nexus\skillcenter\dto\personal\UserSettingsDTO.class
 net\ooder\skillcenter\p2p\refresh\SkillsAgentRefreshEngine$RefreshResult.class
 net\ooder\skillcenter\personalai\PersonalSkillManager$PersonalSkill.class
+net\ooder\skillcenter\shell\security\SecurityKeyAuditCommand.class
 net\ooder\skillcenter\shell\MarketPopularCommand.class
+net\ooder\nexus\skillcenter\controller\PersonalController.class
 net\ooder\nexus\skillcenter\dto\market\RateRequestDTO.class
+net\ooder\skillcenter\model\User.class
 net\ooder\skillcenter\ide\SkillTestResult.class
 net\ooder\skillcenter\model\GroupMember.class
 net\ooder\skillcenter\security\service\KeyManagementService$KeyType.class
@@ -123,6 +136,9 @@ net\ooder\skillcenter\identity\DecentralizedIdentityManager.class
 net\ooder\nexus\skillcenter\dto\BaseDTO.class
 net\ooder\nexus\skillcenter\dto\execution\ExecuteSkillRequestDTO.class
 net\ooder\nexus\skillcenter\dto\dashboard\MarketStatsDTO.class
+net\ooder\skillcenter\shell\security\SecurityKeyRevokeCommand.class
+net\ooder\skillcenter\shell\security\SecurityKeyListCommand.class
+net\ooder\skillcenter\shell\ExecuteRunCommand$1.class
 net\ooder\skillcenter\storage\ExecutionStorageService.class
 net\ooder\skillcenter\service\ExecutionService.class
 net\ooder\nexus\skillcenter\dto\p2p\P2PStatusDTO.class
@@ -171,6 +187,7 @@ net\ooder\skillcenter\execution\SkillExecutorEngine$SkillExecutionCallback.class
 net\ooder\nexus\skillcenter\dto\personal\HelpContentDTO$FaqDTO.class
 net\ooder\nexus\skillcenter\dto\skill\SkillManifestDTO$ConfigItem.class
 net\ooder\skillcenter\shell\SkillPublishCommand$1.class
+net\ooder\skillcenter\ide\SkillDevelopmentPlugin.class
 net\ooder\skillcenter\dto\SkillResultDTO.class
 net\ooder\skillcenter\shell\HelpCommand.class
 net\ooder\nexus\skillcenter\dto\share\ShareRequestDTO.class
@@ -186,6 +203,7 @@ net\ooder\skillcenter\manager\GroupManager.class
 net\ooder\skillcenter\lifecycle\execution\SkillExecutionManager$ExecutionResult.class
 net\ooder\skillcenter\shell\ExitCommand.class
 net\ooder\nexus\skillcenter\dto\storage\BackupDTO.class
+net\ooder\skillcenter\shell\SkillInfoCommand.class
 net\ooder\skillcenter\distribution\SkillDistributionManager.class
 net\ooder\nexus\skillcenter\dto\common\SearchDTO.class
 net\ooder\skillcenter\manager\HostingManager.class
@@ -243,11 +261,14 @@ net\ooder\skillcenter\service\ShareService.class
 net\ooder\skillcenter\model\Group.class
 net\ooder\nexus\skillcenter\dto\menu\MenuRequestDTO.class
 net\ooder\skillcenter\security\service\KeyManagementService$KeyRevocationResult.class
+net\ooder\skillcenter\SkillCenterApplication.class
 net\ooder\skillcenter\service\PersonalService.class
 net\ooder\skillcenter\test\TestDataGenerator.class
 net\ooder\skillcenter\shell\AbstractCommand.class
 net\ooder\skillcenter\shell\p2p\P2PDiscoverCommand.class
 net\ooder\nexus\skillcenter\dto\storage\StorageStatusDTO.class
+net\ooder\skillcenter\shell\p2p\P2PInfoCommand.class
+net\ooder\skillcenter\shell\lifecycle\SkillHistoryCommand.class
 net\ooder\skillcenter\security\service\KeyManagementService$KeyValidationResult.class
 net\ooder\skillcenter\service\impl\ExecutionServiceMockImpl.class
 net\ooder\nexus\skillcenter\controller\ExecutionController.class
@@ -285,6 +306,7 @@ net\ooder\skillcenter\ide\CodeGenerationPlugin.class
 net\ooder\skillcenter\shell\ExecuteAsyncCommand$1.class
 net\ooder\nexus\skillcenter\dto\personal\IdentityMappingDTO.class
 net\ooder\skillcenter\shell\SystemConfigCommand.class
+net\ooder\skillcenter\shell\security\SecurityKeyInfoCommand.class
 net\ooder\nexus\skillcenter\dto\skill\SkillManifestDTO$Scene.class
 net\ooder\skillcenter\dto\SkillShareDTO.class
 net\ooder\nexus\skillcenter\dto\dashboard\DashboardStatsDTO$AppInfoDTO.class
@@ -331,6 +353,7 @@ net\ooder\skillcenter\dto\UserDTO.class
 net\ooder\skillcenter\service\impl\SkillServiceSdkImpl$2.class
 net\ooder\skillcenter\market\SkillMarketManager.class
 net\ooder\skillcenter\model\Skill.class
+net\ooder\skillcenter\shell\lifecycle\SkillRejectCommand.class
 net\ooder\skillcenter\model\ApiResponse.class
 net\ooder\skillcenter\personalai\IdentityManager$UserIdentity.class
 net\ooder\skillcenter\model\SkillContext.class

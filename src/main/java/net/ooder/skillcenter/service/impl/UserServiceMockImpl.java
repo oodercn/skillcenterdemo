@@ -73,6 +73,15 @@ public class UserServiceMockImpl implements UserService {
     }
 
     @Override
+    public PageResult<UserDTO> getUsersByGroup(String groupId, int pageNum, int pageSize) {
+        List<UserDTO> filtered = userStore.values().stream()
+            .filter(user -> groupId != null && groupId.equals(user.getGroupId()))
+            .sorted(Comparator.comparing(UserDTO::getCreatedAt).reversed())
+            .collect(Collectors.toList());
+        return paginate(filtered, pageNum, pageSize);
+    }
+
+    @Override
     public UserDTO getUserById(String userId) {
         return userStore.get(userId);
     }
