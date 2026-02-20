@@ -2,8 +2,13 @@ package net.ooder.skillcenter.service;
 
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.skillcenter.dto.SkillDTO;
+import net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult;
+import net.ooder.skillcenter.model.SpecValidationModels.VersionHistory;
+import net.ooder.skillcenter.model.SpecValidationModels.SpecValidationReport;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 技能服务接口
@@ -89,4 +94,24 @@ public interface SkillService {
      * 获取共享技能数
      */
     int getSharedSkillCount();
+    
+    /**
+     * 验证技能规范
+     */
+    CompletableFuture<SpecValidationResult> validateSpec(String skillId);
+    
+    /**
+     * 验证技能定义
+     */
+    CompletableFuture<SpecValidationResult> validateDefinition(Map<String, Object> definition);
+    
+    /**
+     * 获取技能版本历史
+     */
+    CompletableFuture<List<VersionHistory>> getVersionHistory(String skillId, int limit);
+    
+    /**
+     * 获取规范验证报告
+     */
+    CompletableFuture<SpecValidationReport> getValidationReport(String skillId);
 }

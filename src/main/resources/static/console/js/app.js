@@ -546,7 +546,7 @@ function viewExecutionResult(executionId) {
                     resultOutput.textContent = JSON.stringify(result, null, 2);
                 }
                 if (resultModal) {
-                    resultModal.style.display = 'block';
+                    resultModal.style.display = 'flex';
                 }
             } else {
                 alert('获取执行结果失败');

@@ -107,24 +107,32 @@ public class SkillMarketManager {
      * 初始化市场数据
      */
     private void initializeMarketData() {
-        // 模拟初始化一些技能列表项
-        addSkillListing(createMockSkillListing("code-generation-skill", "代码生成技能", 
-            "生成各种编程语言的代码", "development", "1.0.0", "https://example.com/skills/code-generation"));
-        
-        addSkillListing(createMockSkillListing("text-to-uppercase-skill", "文本转大写技能", 
-            "将文本转换为大写格式", "utilities", "1.0.0", "https://example.com/skills/text-to-uppercase"));
-        
-        addSkillListing(createMockSkillListing("media-streaming-skill", "媒体流技能", 
-            "提供媒体流服务", "media", "1.0.0", "https://example.com/skills/media-streaming"));
-        
-        addSkillListing(createMockSkillListing("file-storage-skill", "文件存储技能", 
-            "提供文件存储服务", "storage", "1.0.0", "https://example.com/skills/file-storage"));
-        
-        addSkillListing(createMockSkillListing("device-control-skill", "设备控制技能", 
-            "控制智能设备", "iot", "1.0.0", "https://example.com/skills/device-control"));
-        
-        // 生成更多测试技能数据
-        generateTestSkills();
+        // 仅在存储为空时初始化默认技能
+        if (skillListings.isEmpty()) {
+            addSkillListing(createMockSkillListing("code-generation-skill", "代码生成技能", 
+                "生成各种编程语言的代码", "development", "1.0.0", "https://example.com/skills/code-generation"));
+            
+            addSkillListing(createMockSkillListing("text-to-uppercase-skill", "文本转大写技能", 
+                "将文本转换为大写格式", "utilities", "1.0.0", "https://example.com/skills/text-to-uppercase"));
+            
+            addSkillListing(createMockSkillListing("media-streaming-skill", "媒体流技能", 
+                "提供媒体流服务", "media", "1.0.0", "https://example.com/skills/media-streaming"));
+            
+            addSkillListing(createMockSkillListing("file-storage-skill", "文件存储技能", 
+                "提供文件存储服务", "storage", "1.0.0", "https://example.com/skills/file-storage"));
+            
+            addSkillListing(createMockSkillListing("device-control-skill", "设备控制技能", 
+                "控制智能设备", "iot", "1.0.0", "https://example.com/skills/device-control"));
+            
+            // 保存初始数据
+            for (SkillListing listing : skillListings.values()) {
+                skillStorage.saveSkillListing(listing);
+            }
+            
+            logger.info("Initialized 5 default skills");
+        } else {
+            logger.info("Loaded {} existing skills from storage, skipping initialization", skillListings.size());
+        }
     }
     
     /**

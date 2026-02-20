@@ -206,7 +206,7 @@ window.openAddGroupModal = function() {
     groupId.value = '';
     groupName.value = '';
     groupDescription.value = '';
-    groupModal.style.display = 'block';
+    groupModal.style.display = 'flex';
 }
 
 // 打开编辑群组模态框

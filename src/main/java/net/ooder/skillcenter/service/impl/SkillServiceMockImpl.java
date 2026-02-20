@@ -217,6 +217,90 @@ public class SkillServiceMockImpl implements SkillService {
             .count();
     }
 
+    @Override
+    public java.util.concurrent.CompletableFuture<net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult> validateSpec(String skillId) {
+        return java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+            net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult result = new net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult();
+            SkillDTO skill = skillStore.get(skillId);
+            if (skill == null) {
+                result.setValid(false);
+                result.setErrors(java.util.Collections.singletonList("Skill not found: " + skillId));
+            } else {
+                result.setValid(true);
+                result.setErrors(new java.util.ArrayList<>());
+                result.setWarnings(new java.util.ArrayList<>());
+                java.util.Map<String, Object> details = new java.util.HashMap<>();
+                details.put("skillId", skillId);
+                details.put("name", skill.getName());
+                details.put("version", skill.getVersion());
+                result.setDetails(details);
+            }
+            return result;
+        });
+    }
+
+    @Override
+    public java.util.concurrent.CompletableFuture<net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult> validateDefinition(java.util.Map<String, Object> definition) {
+        return java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+            net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult result = new net.ooder.skillcenter.model.SpecValidationModels.SpecValidationResult();
+            java.util.List<String> errors = new java.util.ArrayList<>();
+            java.util.List<String> warnings = new java.util.ArrayList<>();
+            
+            if (definition == null) {
+                errors.add("Definition cannot be null");
+            } else {
+                if (!definition.containsKey("name") || definition.get("name") == null) {
+                    errors.add("Skill name is required");
+                }
+                if (!definition.containsKey("version") || definition.get("version") == null) {
+                    warnings.add("Version is recommended");
+                }
+            }
+            
+            result.setValid(errors.isEmpty());
+            result.setErrors(errors);
+            result.setWarnings(warnings);
+            result.setDetails(definition);
+            return result;
+        });
+    }
+
+    @Override
+    public java.util.concurrent.CompletableFuture<java.util.List<net.ooder.skillcenter.model.SpecValidationModels.VersionHistory>> getVersionHistory(String skillId, int limit) {
+        return java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+            java.util.List<net.ooder.skillcenter.model.SpecValidationModels.VersionHistory> history = new java.util.ArrayList<>();
+            SkillDTO skill = skillStore.get(skillId);
+            if (skill != null) {
+                net.ooder.skillcenter.model.SpecValidationModels.VersionHistory vh = new net.ooder.skillcenter.model.SpecValidationModels.VersionHistory();
+                vh.setVersionId(skillId + "-v1");
+                vh.setSkillId(skillId);
+                vh.setVersion(skill.getVersion() != null ? skill.getVersion() : "1.0.0");
+                vh.setAuthor(skill.getAuthor() != null ? skill.getAuthor() : "unknown");
+                vh.setCreateTime(skill.getCreatedAt() != null ? skill.getCreatedAt().getTime() : System.currentTimeMillis());
+                vh.setChangeDescription("Initial version");
+                history.add(vh);
+            }
+            return history;
+        });
+    }
+
+    @Override
+    public java.util.concurrent.CompletableFuture<net.ooder.skillcenter.model.SpecValidationModels.SpecValidationReport> getValidationReport(String skillId) {
+        return java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+            net.ooder.skillcenter.model.SpecValidationModels.SpecValidationReport report = new net.ooder.skillcenter.model.SpecValidationModels.SpecValidationReport();
+            report.setSkillId(skillId);
+            report.setValidationTime(System.currentTimeMillis());
+            report.setPassed(true);
+            report.setTotalChecks(3);
+            report.setPassedChecks(3);
+            report.setFailedChecks(0);
+            report.setWarningCount(0);
+            report.setChecks(new java.util.ArrayList<>());
+            report.setSummary(new java.util.HashMap<>());
+            return report;
+        });
+    }
+
     private PageResult<SkillDTO> paginate(List<SkillDTO> list, int pageNum, int pageSize) {
         int total = list.size();
         int start = (pageNum - 1) * pageSize;

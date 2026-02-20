@@ -1,327 +1,518 @@
-// 初始化菜单
-initMenu('my-groups');
-
-// 使用 IIFE 封装，避免全局变量污染
 (function() {
-    // 模拟群组数据
-    let myGroups = [];
-    
-    // 模拟群组技能数据
-    let myGroupSkills = [];
-    
-    // 加载群组数据
-    async function loadGroupsData() {
-        try {
-            // 从API获取数据 - 使用正确的API路径
-            const response = await fetch(`${utils.API_BASE_URL}/personal/groups`);
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success && result.data) {
-                    myGroups = result.data;
-                    console.log('[MyGroup] 从API加载群组数据:', myGroups.length);
-                    return;
-                }
-            }
-            throw new Error('API返回数据格式不正确');
-        } catch (error) {
-            console.warn('[MyGroup] API获取失败，使用模拟数据:', error);
-            // 使用模拟数据
-            myGroups = [
-                {
-                    id: 'dev-team',
-                    name: '开发团队',
-                    description: '公司的开发团队，负责产品的技术开发',
-                    memberCount: 15,
-                    createdAt: '2026-01-01',
-                    role: '成员'
-                },
-                {
-                    id: 'marketing-team',
-                    name: '市场团队',
-                    description: '公司的市场团队，负责产品的市场推广',
-                    memberCount: 8,
-                    createdAt: '2026-01-05',
-                    role: '成员'
-                },
-                {
-                    id: 'hr-team',
-                    name: '人力资源团队',
-                    description: '公司的人力资源团队，负责人事管理',
-                    memberCount: 5,
-                    createdAt: '2026-01-10',
-                    role: '管理员'
-                }
-            ];
-        }
+    'use strict';
+
+    let groupsData = [];
+    let currentGroupId = null;
+
+    function postApi(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data || {})
+        }).then(r => r.json());
     }
 
-    // 加载群组技能数据
-    async function loadGroupSkillsData() {
-        try {
-            // 从API获取数据 - 使用正确的API路径
-            const response = await fetch(`${utils.API_BASE_URL}/personal/groups/skills`);
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success && result.data) {
-                    myGroupSkills = result.data;
-                    console.log('[MyGroup] 从API加载群组技能数据:', myGroupSkills.length);
-                    return;
-                }
+    function loadGroups() {
+        postApi('/api/scene-groups/list').then(res => {
+            if (res.code === 0 && res.data) {
+                groupsData = res.data.list || res.data || [];
+                renderGroups();
             }
-            throw new Error('API返回数据格式不正确');
-        } catch (error) {
-            console.warn('[MyGroup] API获取失败，使用模拟数据:', error);
-            // 使用模拟数据
-            myGroupSkills = [
-                {
-                    id: 'group-skill-001',
-                    groupId: 'dev-team',
-                    groupName: '开发团队',
-                    skillId: 'code-generator',
-                    skillName: '代码生成',
-                    sharedBy: '张三',
-                    sharedAt: '2026-01-20',
-                    description: '用于生成各种代码模板'
-                },
-                {
-                    id: 'group-skill-002',
-                    groupId: 'dev-team',
-                    groupName: '开发团队',
-                    skillId: 'json-formatter',
-                    skillName: 'JSON格式化',
-                    sharedBy: '李四',
-                    sharedAt: '2026-01-22',
-                    description: '格式化JSON数据'
-                },
-                {
-                    id: 'group-skill-003',
-                    groupId: 'marketing-team',
-                    groupName: '市场团队',
-                    skillId: 'image-resizer',
-                    skillName: '图片 resize',
-                    sharedBy: '王五',
-                    sharedAt: '2026-01-25',
-                    description: '调整图片大小'
-                }
-            ];
-        }
+        }).catch(err => {
+            console.error('加载群组失败:', err);
+            renderEmptyState();
+        });
     }
 
-    // 渲染群组列表
-    function renderGroupList() {
-        const groupList = document.getElementById('group-list');
-        if (!groupList) return;
-        
-        groupList.innerHTML = '';
-        
-        myGroups.forEach(group => {
-            const groupCard = document.createElement('div');
-            groupCard.className = 'group-card';
-            groupCard.innerHTML = `
-                <div class="group-card-header">
-                    <h3>${group.name}</h3>
-                    <span class="group-role">${group.role}</span>
-                </div>
-                <div class="group-card-body">
-                    <p>${group.description}</p>
-                    <div class="group-meta">
-                        <span class="group-members">成员: ${group.memberCount}人</span>
-                        <span class="group-created">创建于: ${group.createdAt}</span>
+    function renderGroups() {
+        const container = document.querySelector('.nx-grid');
+        if (!container) return;
+
+        if (groupsData.length === 0) {
+            renderEmptyState();
+            return;
+        }
+
+        container.innerHTML = groupsData.map(group => {
+            const memberCount = group.memberCount || (group.members ? group.members.length : 0);
+            const isAdmin = group.myRole === 'admin' || group.myRole === 'PRIMARY';
+            
+            return `
+                <div class="nx-card" data-group-id="${group.sceneGroupId || group.groupId}">
+                    <div class="nx-card__body">
+                        <div class="nx-flex nx-items-center nx-gap-3 nx-mb-3">
+                            <i class="ri-team-line nx-text-2xl nx-text-primary"></i>
+                            <div>
+                                <h4 class="nx-font-semibold">${group.name || group.sceneGroupName || '未命名群组'}</h4>
+                                <span class="nx-text-secondary nx-text-sm">${memberCount} 成员</span>
+                            </div>
+                        </div>
+                        <p class="nx-text-secondary nx-text-sm nx-mb-4">${group.description || '暂无描述'}</p>
+                        <div class="nx-flex nx-gap-2">
+                            <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="viewGroupDetail('${group.sceneGroupId || group.groupId}')">
+                                <i class="ri-eye-line"></i> 详情
+                            </button>
+                            ${isAdmin ? `
+                                <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="openGroupSettings('${group.sceneGroupId || group.groupId}')">
+                                    <i class="ri-settings-3-line"></i> 管理
+                                </button>
+                            ` : ''}
+                            <button class="nx-btn nx-btn--ghost nx-btn--sm nx-text-danger" onclick="leaveGroup('${group.sceneGroupId || group.groupId}')">
+                                <i class="ri-logout-box-line"></i> 退出
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="group-card-footer">
-                    <button class="btn-sm btn-primary view-group-skills-btn" data-id="${group.id}">
-                        <i class="ri-lightbulb-line"></i> 查看技能
-                    </button>
-                </div>
             `;
-            groupList.appendChild(groupCard);
-        });
-        
-        // 绑定查看群组技能按钮事件
-        document.querySelectorAll('.view-group-skills-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const groupId = this.getAttribute('data-id');
-                // 切换到技能标签并筛选该群组的技能
-                const skillsTabBtn = document.querySelector('.tab-btn[data-tab="skills"]');
-                if (skillsTabBtn) skillsTabBtn.click();
-                filterGroupSkills(groupId);
-            });
-        });
+        }).join('');
     }
 
-    // 渲染群组技能
-    function renderGroupSkills() {
-        const groupSkillsContainer = document.getElementById('group-skills');
-        if (!groupSkillsContainer) return;
-        
-        groupSkillsContainer.innerHTML = '';
-        
-        myGroupSkills.forEach(skill => {
-            const skillCard = document.createElement('div');
-            skillCard.className = 'group-skill-card';
-            skillCard.innerHTML = `
-                <div class="group-skill-card-header">
-                    <h4>${skill.skillName}</h4>
-                    <span class="group-name">${skill.groupName}</span>
-                </div>
-                <div class="group-skill-card-body">
-                    <p>${skill.description}</p>
-                    <div class="skill-meta">
-                        <span class="shared-by">分享人: ${skill.sharedBy}</span>
-                        <span class="shared-at">分享时间: ${skill.sharedAt}</span>
-                    </div>
-                </div>
-                <div class="group-skill-card-footer">
-                    <button class="btn-sm btn-primary add-to-my-skills-btn" data-id="${skill.id}">
-                        <i class="ri-add-circle-line"></i> 添加到我的技能
-                    </button>
-                </div>
-            `;
-            groupSkillsContainer.appendChild(skillCard);
-        });
-        
-        // 绑定添加到我的技能按钮事件
-        document.querySelectorAll('.add-to-my-skills-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const skillId = this.getAttribute('data-id');
-                addToMySkills(skillId);
-            });
-        });
+    function renderEmptyState() {
+        const container = document.querySelector('.nx-grid');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="nx-col-span-3 nx-text-center nx-py-12">
+                <i class="ri-team-line nx-text-6xl nx-text-secondary nx-mb-4"></i>
+                <h3 class="nx-text-lg nx-font-semibold nx-mb-2">暂无群组</h3>
+                <p class="nx-text-secondary nx-mb-4">创建一个群组开始协作吧</p>
+                <button class="nx-btn nx-btn--primary" onclick="openCreateGroupModal()">
+                    <i class="ri-add-line"></i> 创建群组
+                </button>
+            </div>
+        `;
     }
 
-    // 筛选群组技能
-    function filterGroupSkills(groupId) {
-        const skillCards = document.querySelectorAll('.group-skill-card');
-        const group = myGroups.find(g => g.id === groupId);
-        if (!group) return;
-        
-        skillCards.forEach(card => {
-            const cardGroupName = card.querySelector('.group-name').textContent;
-            if (cardGroupName === group.name) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-    // 添加到我的技能
-    function addToMySkills(skillId) {
-        const skill = myGroupSkills.find(s => s.id === skillId);
-        if (skill) {
-            alert(`技能 ${skill.skillName} 已添加到我的技能！`);
-            // 这里可以添加实际的添加逻辑
+    window.openCreateGroupModal = function() {
+        const modal = document.getElementById('create-group-modal');
+        if (modal) {
+            modal.classList.add('active');
+            loadAvailableScenes();
         }
-    }
-
-    // 初始化页面
-    async function initPage() {
-        console.log('[MyGroup] 初始化我的群组页面');
-        
-        // 加载数据
-        await loadGroupsData();
-        await loadGroupSkillsData();
-        
-        // 渲染群组列表和群组技能
-        renderGroupList();
-        renderGroupSkills();
-        
-        // 标签切换
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // 移除所有标签的active类
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                // 添加当前标签的active类
-                this.classList.add('active');
-                // 隐藏所有内容
-                document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-                // 显示当前标签的内容
-                const tabId = this.getAttribute('data-tab');
-                const tabContent = document.getElementById(`${tabId}-tab`);
-                if (tabContent) tabContent.style.display = 'block';
-            });
-        });
-        
-        // 搜索群组
-        const groupSearchInput = document.getElementById('group-search-input');
-        if (groupSearchInput) {
-            groupSearchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const activeTabBtn = document.querySelector('.tab-btn.active');
-                if (!activeTabBtn) return;
-                
-                const activeTab = activeTabBtn.getAttribute('data-tab');
-                
-                if (activeTab === 'list') {
-                    const groupCards = document.querySelectorAll('.group-card');
-                    groupCards.forEach(card => {
-                        const groupName = card.querySelector('h3').textContent.toLowerCase();
-                        const groupDescription = card.querySelector('p').textContent.toLowerCase();
-                        if (groupName.includes(searchTerm) || groupDescription.includes(searchTerm)) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                } else if (activeTab === 'skills') {
-                    const skillCards = document.querySelectorAll('.group-skill-card');
-                    skillCards.forEach(card => {
-                        const skillName = card.querySelector('h4').textContent.toLowerCase();
-                        const groupName = card.querySelector('.group-name').textContent.toLowerCase();
-                        if (skillName.includes(searchTerm) || groupName.includes(searchTerm)) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                }
-            });
-        }
-    }
-    
-    // 导出初始化函数供外部调用
-    window.initMyGroupPage = function() {
-        console.log('[MyGroup] 外部初始化调用');
-        
-        // 使用重试机制确保页面内容已加载
-        let retryCount = 0;
-        const maxRetries = 10;
-        const retryInterval = 200;
-        
-        function tryInit() {
-            const groupList = document.getElementById('group-list');
-            const groupSkills = document.getElementById('group-skills');
-            
-            if (groupList && groupSkills) {
-                console.log('[MyGroup] 页面元素已就绪，执行初始化');
-                initPage();
-                return true;
-            }
-            
-            retryCount++;
-            if (retryCount < maxRetries) {
-                console.log(`[MyGroup] 页面元素未就绪，第${retryCount}次重试...`);
-                setTimeout(tryInit, retryInterval);
-            } else {
-                console.error('[MyGroup] 达到最大重试次数，页面元素仍未就绪');
-                console.error('[MyGroup] group-list:', groupList);
-                console.error('[MyGroup] group-skills:', groupSkills);
-            }
-            return false;
-        }
-        
-        tryInit();
     };
-    
-    // DOMContentLoaded 事件（直接访问页面时使用）
-    document.addEventListener('DOMContentLoaded', function() {
-        // 检查是否是通过菜单加载的（menu.js会调用initMyGroupPage）
-        // 如果页面元素已经存在，说明是直接访问页面
-        const groupList = document.getElementById('group-list');
-        if (groupList) {
-            console.log('[MyGroup] 直接访问页面，自动初始化');
-            initPage();
+
+    window.closeCreateGroupModal = function() {
+        const modal = document.getElementById('create-group-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.getElementById('create-group-form').reset();
         }
-    });
+    };
+
+    function loadAvailableScenes() {
+        postApi('/api/scenes/list').then(res => {
+            if (res.code === 0 && res.data) {
+                const scenes = res.data.list || res.data || [];
+                const select = document.getElementById('create-scene-select');
+                if (select) {
+                    select.innerHTML = '<option value="">请选择场景</option>' +
+                        scenes.map(s => `<option value="${s.sceneId}">${s.name}</option>`).join('');
+                }
+            }
+        });
+    }
+
+    window.submitCreateGroup = function() {
+        const form = document.getElementById('create-group-form');
+        const formData = new FormData(form);
+        
+        const data = {
+            name: formData.get('name'),
+            sceneId: formData.get('sceneId'),
+            description: formData.get('description'),
+            maxMembers: parseInt(formData.get('maxMembers')) || 10
+        };
+
+        if (!data.name || !data.sceneId) {
+            alert('请填写群组名称并选择场景');
+            return;
+        }
+
+        postApi('/api/scene-groups/create', data).then(res => {
+            if (res.code === 0) {
+                alert('群组创建成功');
+                closeCreateGroupModal();
+                loadGroups();
+            } else {
+                alert('创建失败: ' + (res.message || '未知错误'));
+            }
+        }).catch(err => {
+            alert('创建失败: ' + err.message);
+        });
+    };
+
+    window.viewGroupDetail = function(groupId) {
+        currentGroupId = groupId;
+        
+        postApi('/api/scene-groups/get', { sceneGroupId: groupId }).then(res => {
+            if (res.code === 0 && res.data) {
+                showGroupDetailModal(res.data);
+            }
+        });
+    };
+
+    function showGroupDetailModal(group) {
+        const modal = document.getElementById('group-detail-modal');
+        if (!modal) return;
+
+        const members = group.members || [];
+        const sharedSkills = group.sharedSkills || [];
+
+        document.getElementById('detail-group-name').textContent = group.name || group.sceneGroupName || '未命名';
+        document.getElementById('detail-member-count').textContent = members.length + ' 成员';
+        document.getElementById('detail-description').textContent = group.description || '暂无描述';
+
+        const membersList = document.getElementById('detail-members-list');
+        if (membersList) {
+            membersList.innerHTML = members.map(m => `
+                <div class="nx-flex nx-items-center nx-justify-between nx-py-2 nx-border-b">
+                    <div class="nx-flex nx-items-center nx-gap-2">
+                        <i class="ri-user-line"></i>
+                        <span>${m.nodeName || m.userName || m.nodeId}</span>
+                    </div>
+                    <div>
+                        <span class="nx-badge ${m.role === 'PRIMARY' ? 'nx-badge--primary' : m.role === 'BACKUP' ? 'nx-badge--info' : 'nx-badge--secondary'}">
+                            ${m.role === 'PRIMARY' ? '主节点' : m.role === 'BACKUP' ? '备份节点' : '观察者'}
+                        </span>
+                        <span class="nx-text-secondary nx-text-sm nx-ml-2">${m.status === 'online' ? '在线' : '离线'}</span>
+                    </div>
+                </div>
+            `).join('') || '<p class="nx-text-secondary">暂无成员</p>';
+        }
+
+        const skillsList = document.getElementById('detail-skills-list');
+        if (skillsList) {
+            skillsList.innerHTML = sharedSkills.map(s => `
+                <div class="nx-flex nx-items-center nx-justify-between nx-py-2 nx-border-b">
+                    <span>${s.skillName}</span>
+                    <span class="nx-text-secondary nx-text-sm">${s.permission || '只读'}</span>
+                </div>
+            `).join('') || '<p class="nx-text-secondary">暂无共享技能</p>';
+        }
+
+        modal.classList.add('active');
+    }
+
+    window.closeGroupDetailModal = function() {
+        const modal = document.getElementById('group-detail-modal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+        currentGroupId = null;
+    };
+
+    window.leaveGroup = function(groupId) {
+        if (!confirm('确定要退出该群组吗？')) return;
+
+        postApi('/api/scene-groups/leave', { sceneGroupId: groupId }).then(res => {
+            if (res.code === 0) {
+                alert('已退出群组');
+                loadGroups();
+            } else {
+                alert('退出失败: ' + (res.message || '未知错误'));
+            }
+        }).catch(err => {
+            alert('退出失败: ' + err.message);
+        });
+    };
+
+    window.openGroupSettings = function(groupId) {
+        currentGroupId = groupId;
+        
+        postApi('/api/scene-groups/get', { sceneGroupId: groupId }).then(res => {
+            if (res.code === 0 && res.data) {
+                showGroupSettingsModal(res.data);
+            }
+        });
+    };
+
+    function showGroupSettingsModal(group) {
+        const modal = document.getElementById('group-settings-modal');
+        if (!modal) return;
+
+        document.getElementById('settings-group-name').value = group.name || '';
+        document.getElementById('settings-description').value = group.description || '';
+        document.getElementById('settings-max-members').value = group.maxMembers || 10;
+
+        modal.classList.add('active');
+    }
+
+    window.closeGroupSettingsModal = function() {
+        const modal = document.getElementById('group-settings-modal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    };
+
+    window.saveGroupSettings = function() {
+        const data = {
+            sceneGroupId: currentGroupId,
+            name: document.getElementById('settings-group-name').value,
+            description: document.getElementById('settings-description').value,
+            maxMembers: parseInt(document.getElementById('settings-max-members').value) || 10
+        };
+
+        postApi('/api/scene-groups/update', data).then(res => {
+            if (res.code === 0) {
+                alert('设置保存成功');
+                closeGroupSettingsModal();
+                loadGroups();
+            } else {
+                alert('保存失败: ' + (res.message || '未知错误'));
+            }
+        }).catch(err => {
+            alert('保存失败: ' + err.message);
+        });
+    };
+
+    window.openInviteModal = function() {
+        if (!currentGroupId) return;
+        
+        const modal = document.getElementById('invite-member-modal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+    };
+
+    window.closeInviteModal = function() {
+        const modal = document.getElementById('invite-member-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.getElementById('invite-member-id').value = '';
+        }
+    };
+
+    window.inviteMember = function() {
+        const memberId = document.getElementById('invite-member-id').value;
+        const role = document.getElementById('invite-member-role').value;
+
+        if (!memberId) {
+            alert('请输入成员ID');
+            return;
+        }
+
+        postApi('/api/scene-groups/join', {
+            sceneGroupId: currentGroupId,
+            nodeId: memberId,
+            role: role
+        }).then(res => {
+            if (res.code === 0) {
+                alert('邀请成功');
+                closeInviteModal();
+                viewGroupDetail(currentGroupId);
+            } else {
+                alert('邀请失败: ' + (res.message || '未知错误'));
+            }
+        }).catch(err => {
+            alert('邀请失败: ' + err.message);
+        });
+    };
+
+    window.destroyGroup = function() {
+        if (!currentGroupId) return;
+        
+        if (!confirm('确定要解散该群组吗？此操作不可恢复！')) return;
+        if (!confirm('再次确认：解散群组将移除所有成员，确定继续？')) return;
+
+        postApi('/api/scene-groups/destroy', { sceneGroupId: currentGroupId }).then(res => {
+            if (res.code === 0) {
+                alert('群组已解散');
+                closeGroupSettingsModal();
+                loadGroups();
+            } else {
+                alert('解散失败: ' + (res.message || '未知错误'));
+            }
+        }).catch(err => {
+            alert('解散失败: ' + err.message);
+        });
+    };
+
+    window.generateKey = function(groupId) {
+        if (!confirm('确定要重新生成密钥吗？旧密钥将失效。')) return;
+
+        postApi('/api/scene-groups/key/generate', { sceneGroupId: groupId }).then(res => {
+            if (res.code === 0) {
+                alert('密钥生成成功');
+            } else {
+                alert('密钥生成失败: ' + (res.message || '未知错误'));
+            }
+        }).catch(err => {
+            alert('密钥生成失败: ' + err.message);
+        });
+    };
+
+    function initCreateButton() {
+        const createBtn = document.querySelector('.nx-btn--primary');
+        if (createBtn && createBtn.textContent.includes('创建群组')) {
+            createBtn.setAttribute('onclick', 'openCreateGroupModal()');
+        }
+    }
+
+    function initModals() {
+        const modalsHtml = `
+            <div class="nx-modal" id="create-group-modal">
+                <div class="nx-modal__backdrop" onclick="closeCreateGroupModal()"></div>
+                <div class="nx-modal__content">
+                    <div class="nx-modal__header">
+                        <h3 class="nx-modal__title">创建群组</h3>
+                        <button class="nx-modal__close" onclick="closeCreateGroupModal()">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="nx-modal__body">
+                        <form id="create-group-form">
+                            <div class="nx-form-group nx-mb-4">
+                                <label class="nx-form-label">群组名称</label>
+                                <input type="text" class="nx-input" name="name" placeholder="输入群组名称" required>
+                            </div>
+                            <div class="nx-form-group nx-mb-4">
+                                <label class="nx-form-label">关联场景</label>
+                                <select class="nx-input" name="sceneId" id="create-scene-select" required>
+                                    <option value="">请选择场景</option>
+                                </select>
+                            </div>
+                            <div class="nx-form-group nx-mb-4">
+                                <label class="nx-form-label">描述</label>
+                                <textarea class="nx-input" name="description" rows="3" placeholder="群组描述（可选）"></textarea>
+                            </div>
+                            <div class="nx-form-group nx-mb-4">
+                                <label class="nx-form-label">最大成员数</label>
+                                <input type="number" class="nx-input" name="maxMembers" value="10" min="2" max="100">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="nx-modal__footer">
+                        <button class="nx-btn nx-btn--secondary" onclick="closeCreateGroupModal()">取消</button>
+                        <button class="nx-btn nx-btn--primary" onclick="submitCreateGroup()">创建</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nx-modal" id="group-detail-modal">
+                <div class="nx-modal__backdrop" onclick="closeGroupDetailModal()"></div>
+                <div class="nx-modal__content" style="max-width: 600px;">
+                    <div class="nx-modal__header">
+                        <h3 class="nx-modal__title">群组详情</h3>
+                        <button class="nx-modal__close" onclick="closeGroupDetailModal()">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="nx-modal__body">
+                        <div class="nx-mb-4">
+                            <h4 class="nx-font-semibold" id="detail-group-name">群组名称</h4>
+                            <p class="nx-text-secondary nx-text-sm" id="detail-member-count">0 成员</p>
+                            <p class="nx-text-secondary nx-text-sm" id="detail-description">描述</p>
+                        </div>
+                        
+                        <div class="nx-mb-4">
+                            <h5 class="nx-font-semibold nx-mb-2">成员列表</h5>
+                            <div id="detail-members-list" class="nx-max-h-48 nx-overflow-y-auto"></div>
+                        </div>
+
+                        <div class="nx-mb-4">
+                            <h5 class="nx-font-semibold nx-mb-2">共享技能</h5>
+                            <div id="detail-skills-list" class="nx-max-h-48 nx-overflow-y-auto"></div>
+                        </div>
+                    </div>
+                    <div class="nx-modal__footer">
+                        <button class="nx-btn nx-btn--secondary" onclick="openInviteModal()">
+                            <i class="ri-user-add-line"></i> 邀请成员
+                        </button>
+                        <button class="nx-btn nx-btn--secondary" onclick="generateKey(currentGroupId)">
+                            <i class="ri-key-line"></i> 生成密钥
+                        </button>
+                        <button class="nx-btn nx-btn--primary" onclick="closeGroupDetailModal()">关闭</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nx-modal" id="invite-member-modal">
+                <div class="nx-modal__backdrop" onclick="closeInviteModal()"></div>
+                <div class="nx-modal__content">
+                    <div class="nx-modal__header">
+                        <h3 class="nx-modal__title">邀请成员</h3>
+                        <button class="nx-modal__close" onclick="closeInviteModal()">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="nx-modal__body">
+                        <div class="nx-form-group nx-mb-4">
+                            <label class="nx-form-label">成员ID</label>
+                            <input type="text" class="nx-input" id="invite-member-id" placeholder="输入要邀请的成员ID">
+                        </div>
+                        <div class="nx-form-group nx-mb-4">
+                            <label class="nx-form-label">角色</label>
+                            <select class="nx-input" id="invite-member-role">
+                                <option value="OBSERVER">观察者</option>
+                                <option value="BACKUP">备份节点</option>
+                                <option value="PRIMARY">主节点</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="nx-modal__footer">
+                        <button class="nx-btn nx-btn--secondary" onclick="closeInviteModal()">取消</button>
+                        <button class="nx-btn nx-btn--primary" onclick="inviteMember()">邀请</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nx-modal" id="group-settings-modal">
+                <div class="nx-modal__backdrop" onclick="closeGroupSettingsModal()"></div>
+                <div class="nx-modal__content">
+                    <div class="nx-modal__header">
+                        <h3 class="nx-modal__title">群组设置</h3>
+                        <button class="nx-modal__close" onclick="closeGroupSettingsModal()">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="nx-modal__body">
+                        <div class="nx-form-group nx-mb-4">
+                            <label class="nx-form-label">群组名称</label>
+                            <input type="text" class="nx-input" id="settings-group-name">
+                        </div>
+                        <div class="nx-form-group nx-mb-4">
+                            <label class="nx-form-label">描述</label>
+                            <textarea class="nx-input" id="settings-description" rows="3"></textarea>
+                        </div>
+                        <div class="nx-form-group nx-mb-4">
+                            <label class="nx-form-label">最大成员数</label>
+                            <input type="number" class="nx-input" id="settings-max-members" min="2" max="100">
+                        </div>
+                    </div>
+                    <div class="nx-modal__footer">
+                        <button class="nx-btn nx-btn--danger" onclick="destroyGroup()">
+                            <i class="ri-delete-bin-line"></i> 解散群组
+                        </button>
+                        <button class="nx-btn nx-btn--secondary" onclick="closeGroupSettingsModal()">取消</button>
+                        <button class="nx-btn nx-btn--primary" onclick="saveGroupSettings()">保存</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalsHtml);
+    }
+
+    window.initMyGroupPage = function() {
+        initCreateButton();
+        initModals();
+        loadGroups();
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.onPageInit === 'function') {
+                const originalInit = window.onPageInit;
+                window.onPageInit = function() {
+                    originalInit();
+                    window.initMyGroupPage();
+                };
+            } else {
+                window.onPageInit = window.initMyGroupPage;
+            }
+        });
+    } else {
+        window.initMyGroupPage();
+    }
+
 })();

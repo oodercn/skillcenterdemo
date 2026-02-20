@@ -2,127 +2,74 @@ package net.ooder.skillcenter.service.impl;
 
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.skillcenter.dto.scene.*;
+import net.ooder.skillcenter.sdk.SceneGroupSdkAdapter;
 import net.ooder.skillcenter.service.SceneGroupService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 public class SceneGroupServiceMockImpl implements SceneGroupService {
 
-    private final Map<String, SceneGroupDTO> groupStore = new ConcurrentHashMap<>();
-    private final Map<String, List<SceneMemberDTO>> memberStore = new ConcurrentHashMap<>();
-    private final Map<String, FailoverStatusDTO> failoverStore = new ConcurrentHashMap<>();
-    private final Map<String, SceneGroupKeyDTO> keyStore = new ConcurrentHashMap<>();
+    @Autowired
+    private SceneGroupSdkAdapter sdkAdapter;
 
     @Override
     public SceneGroupDTO create(String sceneId, SceneGroupConfigDTO config) {
-        String groupId = "sg-" + UUID.randomUUID().toString().substring(0, 8);
-        SceneGroupDTO group = new SceneGroupDTO();
-        group.setSceneGroupId(groupId);
-        group.setSceneId(sceneId);
-        group.setName("SceneGroup-" + groupId);
-        group.setStatus("active");
-        group.setMemberCount(0);
-        group.setCreateTime(System.currentTimeMillis());
-        group.setLastUpdateTime(System.currentTimeMillis());
-        groupStore.put(groupId, group);
-        memberStore.put(groupId, new ArrayList<>());
-        return group;
+        return sdkAdapter.createSceneGroup(sceneId, config);
     }
 
     @Override
     public boolean destroy(String sceneGroupId) {
-        groupStore.remove(sceneGroupId);
-        memberStore.remove(sceneGroupId);
-        failoverStore.remove(sceneGroupId);
-        keyStore.remove(sceneGroupId);
-        return true;
+        return sdkAdapter.destroySceneGroup(sceneGroupId);
     }
 
     @Override
     public SceneGroupDTO get(String sceneGroupId) {
-        return groupStore.get(sceneGroupId);
+        return sdkAdapter.getSceneGroup(sceneGroupId);
     }
 
     @Override
     public PageResult<SceneGroupDTO> listAll(int pageNum, int pageSize) {
-        List<SceneGroupDTO> all = new ArrayList<>(groupStore.values());
-        return paginate(all, pageNum, pageSize);
+        return sdkAdapter.listSceneGroups(pageNum, pageSize);
     }
 
     @Override
     public PageResult<SceneGroupDTO> listByScene(String sceneId, int pageNum, int pageSize) {
-        List<SceneGroupDTO> filtered = groupStore.values().stream()
-            .filter(g -> sceneId.equals(g.getSceneId()))
-            .collect(Collectors.toList());
-        return paginate(filtered, pageNum, pageSize);
+        PageResult<SceneGroupDTO> all = sdkAdapter.listSceneGroups(pageNum, 1000);
+        List<SceneGroupDTO> filtered = new ArrayList<>();
+        for (SceneGroupDTO group : all.getList()) {
+            if (sceneId.equals(group.getSceneId())) {
+                filtered.add(group);
+            }
+        }
+        int total = filtered.size();
+        int start = (pageNum - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
+        List<SceneGroupDTO> pageData = start < total ? filtered.subList(start, end) : Collections.emptyList();
+        return new PageResult<>(pageData, total, pageNum, pageSize);
     }
 
     @Override
     public boolean join(String sceneGroupId, String agentId, String role) {
-        SceneGroupDTO group = groupStore.get(sceneGroupId);
-        if (group == null) return false;
-        
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return false;
-        
-        SceneMemberDTO member = new SceneMemberDTO();
-        member.setAgentId(agentId);
-        member.setAgentName("Agent-" + agentId);
-        member.setRole(role);
-        member.setSceneGroupId(sceneGroupId);
-        member.setJoinTime(System.currentTimeMillis());
-        member.setLastHeartbeat(System.currentTimeMillis());
-        member.setStatus("active");
-        
-        members.add(member);
-        group.setMemberCount(members.size());
-        
-        if ("primary".equals(role)) {
-            group.setPrimaryAgentId(agentId);
-        }
-        
-        return true;
+        return sdkAdapter.joinSceneGroup(sceneGroupId, agentId, role);
     }
 
     @Override
     public boolean leave(String sceneGroupId, String agentId) {
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return false;
-        
-        boolean removed = members.removeIf(m -> agentId.equals(m.getAgentId()));
-        if (removed) {
-            SceneGroupDTO group = groupStore.get(sceneGroupId);
-            if (group != null) {
-                group.setMemberCount(members.size());
-            }
-        }
-        return removed;
+        return sdkAdapter.leaveSceneGroup(sceneGroupId, agentId);
     }
 
     @Override
     public boolean changeRole(String sceneGroupId, String agentId, String newRole) {
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return false;
-        
-        for (SceneMemberDTO member : members) {
-            if (agentId.equals(member.getAgentId())) {
-                member.setRole(newRole);
-                return true;
-            }
-        }
-        return false;
+        return true;
     }
 
     @Override
     public String getRole(String sceneGroupId, String agentId) {
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return null;
-        
-        for (SceneMemberDTO member : members) {
+        PageResult<SceneMemberDTO> members = sdkAdapter.listMembers(sceneGroupId, 1, 1000);
+        for (SceneMemberDTO member : members.getList()) {
             if (agentId.equals(member.getAgentId())) {
                 return member.getRole();
             }
@@ -132,107 +79,77 @@ public class SceneGroupServiceMockImpl implements SceneGroupService {
 
     @Override
     public PageResult<SceneMemberDTO> listMembers(String sceneGroupId, int pageNum, int pageSize) {
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return new PageResult<>(Collections.emptyList(), 0, pageNum, pageSize);
-        return paginate(members, pageNum, pageSize);
+        return sdkAdapter.listMembers(sceneGroupId, pageNum, pageSize);
     }
 
     @Override
     public SceneMemberDTO getPrimary(String sceneGroupId) {
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return null;
-        
-        for (SceneMemberDTO member : members) {
-            if ("primary".equals(member.getRole())) {
-                return member;
-            }
-        }
-        return null;
+        return sdkAdapter.getPrimaryMember(sceneGroupId);
     }
 
     @Override
     public PageResult<SceneMemberDTO> getBackups(String sceneGroupId, int pageNum, int pageSize) {
-        List<SceneMemberDTO> members = memberStore.get(sceneGroupId);
-        if (members == null) return new PageResult<>(Collections.emptyList(), 0, pageNum, pageSize);
-        
-        List<SceneMemberDTO> backups = members.stream()
-            .filter(m -> "backup".equals(m.getRole()))
-            .collect(Collectors.toList());
-        return paginate(backups, pageNum, pageSize);
+        PageResult<SceneMemberDTO> all = sdkAdapter.listMembers(sceneGroupId, pageNum, 1000);
+        List<SceneMemberDTO> backups = new ArrayList<>();
+        for (SceneMemberDTO member : all.getList()) {
+            if ("BACKUP".equalsIgnoreCase(member.getRole())) {
+                backups.add(member);
+            }
+        }
+        int total = backups.size();
+        int start = (pageNum - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
+        List<SceneMemberDTO> pageData = start < total ? backups.subList(start, end) : Collections.emptyList();
+        return new PageResult<>(pageData, total, pageNum, pageSize);
     }
 
     @Override
     public boolean handleFailover(String sceneGroupId, String failedMemberId) {
-        SceneGroupDTO group = groupStore.get(sceneGroupId);
-        if (group == null) return false;
-        
-        FailoverStatusDTO status = new FailoverStatusDTO();
-        status.setSceneGroupId(sceneGroupId);
-        status.setInProgress(true);
-        status.setFailedMemberId(failedMemberId);
-        status.setStartTime(System.currentTimeMillis());
-        status.setPhase("detecting");
-        failoverStore.put(sceneGroupId, status);
-        
-        return true;
+        return sdkAdapter.handleFailover(sceneGroupId, failedMemberId);
     }
 
     @Override
     public FailoverStatusDTO getFailoverStatus(String sceneGroupId) {
-        return failoverStore.get(sceneGroupId);
+        return sdkAdapter.getFailoverStatus(sceneGroupId);
     }
 
     @Override
     public boolean startHeartbeat(String sceneGroupId) {
-        SceneGroupDTO group = groupStore.get(sceneGroupId);
-        return group != null;
+        return sdkAdapter.getSceneGroup(sceneGroupId) != null;
     }
 
     @Override
     public boolean stopHeartbeat(String sceneGroupId) {
-        SceneGroupDTO group = groupStore.get(sceneGroupId);
-        return group != null;
+        return sdkAdapter.getSceneGroup(sceneGroupId) != null;
     }
 
     @Override
     public SceneGroupKeyDTO generateKey(String sceneGroupId) {
-        String keyId = "key-" + UUID.randomUUID().toString().substring(0, 8);
-        SceneGroupKeyDTO key = new SceneGroupKeyDTO();
-        key.setKeyId(keyId);
-        key.setSceneGroupId(sceneGroupId);
-        key.setKeyData(Base64.getEncoder().encodeToString(keyId.getBytes()));
-        key.setCreateTime(System.currentTimeMillis());
-        keyStore.put(sceneGroupId, key);
-        return key;
+        return sdkAdapter.generateKey(sceneGroupId);
     }
 
     @Override
     public SceneGroupKeyDTO reconstructKey(String sceneGroupId, List<KeyShareDTO> shares) {
-        return keyStore.get(sceneGroupId);
+        return sdkAdapter.reconstructKey(sceneGroupId, shares);
     }
 
     @Override
     public boolean distributeKeyShares(String sceneGroupId, SceneGroupKeyDTO key) {
-        SceneGroupDTO group = groupStore.get(sceneGroupId);
-        return group != null;
+        return sdkAdapter.distributeKeyShares(sceneGroupId, key);
     }
 
     @Override
     public VfsPermissionDTO getVfsPermission(String sceneGroupId, String agentId) {
-        VfsPermissionDTO permission = new VfsPermissionDTO();
-        permission.setAgentId(agentId);
-        permission.setSceneGroupId(sceneGroupId);
-        permission.setReadablePaths(Arrays.asList("/data", "/config"));
-        permission.setWritablePaths(Arrays.asList("/data"));
-        permission.setFullAccess(false);
-        return permission;
+        return sdkAdapter.getVfsPermission(sceneGroupId, agentId);
     }
 
-    private <T> PageResult<T> paginate(List<T> list, int pageNum, int pageSize) {
-        int total = list.size();
-        int start = (pageNum - 1) * pageSize;
-        int end = Math.min(start + pageSize, total);
-        List<T> pageData = start < total ? list.subList(start, end) : Collections.emptyList();
-        return new PageResult<>(pageData, total, pageNum, pageSize);
+    @Override
+    public PageResult<VfsPermissionDTO> listVfsPermissions(String sceneGroupId, int pageNum, int pageSize) {
+        return sdkAdapter.listVfsPermissions(sceneGroupId, pageNum, pageSize);
+    }
+
+    @Override
+    public VfsPermissionDTO addVfsPermission(String sceneGroupId, String agentId, String permissionType, String path) {
+        return sdkAdapter.addVfsPermission(sceneGroupId, agentId, permissionType, path);
     }
 }

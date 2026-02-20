@@ -382,7 +382,7 @@ function openIssueCertificateModal() {
     // 每次打开模态框时重新加载技能列表
     initSkillSelector();
 
-    document.getElementById('certificateModal').style.display = 'block';
+    document.getElementById('certificateModal').style.display = 'flex';
 }
 
 // 关闭签发认证模态框
@@ -406,7 +406,7 @@ function reviewAuth(authId) {
                     <p><strong>申请人:</strong> ${auth.applicant}</p>
                     <p><strong>申请时间:</strong> ${auth.appliedAt ? new Date(auth.appliedAt).toLocaleString() : ''}</p>
                 `;
-                document.getElementById('reviewModal').style.display = 'block';
+                document.getElementById('reviewModal').style.display = 'flex';
             } else {
                 utils.message.error('获取认证详情失败');
             }

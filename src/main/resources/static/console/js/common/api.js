@@ -1256,6 +1256,262 @@ export const systemApi = {
 };
 
 /**
+ * 监控管理 API
+ */
+export const monitorApi = {
+    async getMonitorList() {
+        try {
+            const result = await ApiClient.post('/api/monitor/list', {});
+            return result;
+        } catch (error) {
+            console.error('Failed to get monitor list:', error);
+            throw error;
+        }
+    },
+
+    async getRealtimeMonitor(skillId) {
+        try {
+            const result = await ApiClient.post(`/api/monitor/realtime/${skillId}`, {});
+            return result;
+        } catch (error) {
+            console.error('Failed to get realtime monitor:', error);
+            throw error;
+        }
+    },
+
+    async getMetricsHistory(skillId, params = {}) {
+        try {
+            const result = await ApiClient.post(`/api/monitor/metrics/${skillId}`, {
+                startTime: params.startTime,
+                endTime: params.endTime,
+                resolution: params.resolution || '1m'
+            });
+            return result;
+        } catch (error) {
+            console.error('Failed to get metrics history:', error);
+            throw error;
+        }
+    },
+
+    async getAlerts(params = {}) {
+        try {
+            const result = await ApiClient.post('/api/monitor/alerts', {
+                skillId: params.skillId,
+                severity: params.severity,
+                status: params.status,
+                pageNum: params.pageNum || 1,
+                pageSize: params.pageSize || 10
+            });
+            return result;
+        } catch (error) {
+            console.error('Failed to get alerts:', error);
+            throw error;
+        }
+    },
+
+    async getLogs(skillId, params = {}) {
+        try {
+            const result = await ApiClient.post(`/api/monitor/logs/${skillId}`, {
+                level: params.level,
+                keyword: params.keyword,
+                startTime: params.startTime,
+                endTime: params.endTime,
+                pageNum: params.pageNum || 1,
+                pageSize: params.pageSize || 20
+            });
+            return result;
+        } catch (error) {
+            console.error('Failed to get logs:', error);
+            throw error;
+        }
+    },
+
+    async getMonitorStats() {
+        try {
+            const result = await ApiClient.post('/api/monitor/stats', {});
+            return result;
+        } catch (error) {
+            console.error('Failed to get monitor stats:', error);
+            throw error;
+        }
+    }
+};
+
+/**
+ * 编排管理 API
+ */
+export const orchestrationApi = {
+    async getTemplates(params = {}) {
+        try {
+            const result = await ApiClient.post('/api/orchestration/templates', {
+                category: params.category,
+                status: params.status,
+                pageNum: params.pageNum || 1,
+                pageSize: params.pageSize || 10
+            });
+            return result;
+        } catch (error) {
+            console.error('Failed to get templates:', error);
+            throw error;
+        }
+    },
+
+    async getTemplate(templateId) {
+        try {
+            const result = await ApiClient.post('/api/orchestration/templates/get', { templateId });
+            return result;
+        } catch (error) {
+            console.error('Failed to get template:', error);
+            throw error;
+        }
+    },
+
+    async createTemplate(templateData) {
+        try {
+            ApiClient.showLoading('创建模板...');
+            const result = await ApiClient.post('/api/orchestration/templates/create', templateData);
+            ApiClient.hideLoading();
+            ApiClient.showSuccess('创建模板成功');
+            return result;
+        } catch (error) {
+            console.error('Failed to create template:', error);
+            ApiClient.hideLoading();
+            ApiClient.showError('创建模板失败: ' + error.message);
+            throw error;
+        }
+    },
+
+    async updateTemplate(templateId, templateData) {
+        try {
+            ApiClient.showLoading('更新模板...');
+            const result = await ApiClient.post('/api/orchestration/templates/update', {
+                templateId,
+                ...templateData
+            });
+            ApiClient.hideLoading();
+            ApiClient.showSuccess('更新模板成功');
+            return result;
+        } catch (error) {
+            console.error('Failed to update template:', error);
+            ApiClient.hideLoading();
+            ApiClient.showError('更新模板失败: ' + error.message);
+            throw error;
+        }
+    },
+
+    async deleteTemplate(templateId) {
+        try {
+            ApiClient.showLoading('删除模板...');
+            const result = await ApiClient.post('/api/orchestration/templates/delete', { templateId });
+            ApiClient.hideLoading();
+            ApiClient.showSuccess('删除模板成功');
+            return result;
+        } catch (error) {
+            console.error('Failed to delete template:', error);
+            ApiClient.hideLoading();
+            ApiClient.showError('删除模板失败: ' + error.message);
+            throw error;
+        }
+    },
+
+    async executeTemplate(templateId, params = {}) {
+        try {
+            ApiClient.showLoading('执行编排...');
+            const result = await ApiClient.post('/api/orchestration/execute', {
+                templateId,
+                parameters: params
+            });
+            ApiClient.hideLoading();
+            ApiClient.showSuccess('执行编排成功');
+            return result;
+        } catch (error) {
+            console.error('Failed to execute template:', error);
+            ApiClient.hideLoading();
+            ApiClient.showError('执行编排失败: ' + error.message);
+            throw error;
+        }
+    },
+
+    async getExecutionStatus(executionId) {
+        try {
+            const result = await ApiClient.post(`/api/orchestration/status/${executionId}`, {});
+            return result;
+        } catch (error) {
+            console.error('Failed to get execution status:', error);
+            throw error;
+        }
+    },
+
+    async getExecutions(params = {}) {
+        try {
+            const result = await ApiClient.post('/api/orchestration/executions', {
+                templateId: params.templateId,
+                status: params.status,
+                pageNum: params.pageNum || 1,
+                pageSize: params.pageSize || 10
+            });
+            return result;
+        } catch (error) {
+            console.error('Failed to get executions:', error);
+            throw error;
+        }
+    },
+
+    async getSchedules(params = {}) {
+        try {
+            const result = await ApiClient.post('/api/orchestration/schedules', {
+                pageNum: params.pageNum || 1,
+                pageSize: params.pageSize || 10
+            });
+            return result;
+        } catch (error) {
+            console.error('Failed to get schedules:', error);
+            throw error;
+        }
+    },
+
+    async createSchedule(scheduleData) {
+        try {
+            ApiClient.showLoading('创建计划...');
+            const result = await ApiClient.post('/api/orchestration/schedules/create', scheduleData);
+            ApiClient.hideLoading();
+            ApiClient.showSuccess('创建计划成功');
+            return result;
+        } catch (error) {
+            console.error('Failed to create schedule:', error);
+            ApiClient.hideLoading();
+            ApiClient.showError('创建计划失败: ' + error.message);
+            throw error;
+        }
+    },
+
+    async toggleSchedule(scheduleId) {
+        try {
+            const result = await ApiClient.post('/api/orchestration/schedules/toggle', { scheduleId });
+            return result;
+        } catch (error) {
+            console.error('Failed to toggle schedule:', error);
+            throw error;
+        }
+    },
+
+    async deleteSchedule(scheduleId) {
+        try {
+            ApiClient.showLoading('删除计划...');
+            const result = await ApiClient.post('/api/orchestration/schedules/delete', { scheduleId });
+            ApiClient.hideLoading();
+            ApiClient.showSuccess('删除计划成功');
+            return result;
+        } catch (error) {
+            console.error('Failed to delete schedule:', error);
+            ApiClient.hideLoading();
+            ApiClient.showError('删除计划失败: ' + error.message);
+            throw error;
+        }
+    }
+};
+
+/**
  * 执行管理 API
  */
 export const executionApi = {
@@ -1335,7 +1591,7 @@ export const executionApi = {
 
     async getHistory() {
         try {
-            const result = await ApiClient.post('/api/execution/history', {});
+            const result = await ApiClient.post('/execution/history', {});
             return result;
         } catch (error) {
             console.error('Failed to get execution history:', error);

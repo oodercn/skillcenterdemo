@@ -113,7 +113,7 @@ window.openAddStorageModal = function() {
     const storageForm = document.getElementById('storageForm');
     if (storageForm) storageForm.reset();
 
-    document.getElementById('storageModal').style.display = 'block';
+    document.getElementById('storageModal').style.display = 'flex';
 };
 
 // 关闭存储模态框

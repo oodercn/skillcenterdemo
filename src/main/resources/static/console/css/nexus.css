@@ -384,6 +384,10 @@ ul, ol {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.nx-grid-cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .grid {
   display: grid;
   gap: var(--nx-space-4);
@@ -893,7 +897,8 @@ ul, ol {
 
   .nx-grid-cols-2,
   .nx-grid-cols-3,
-  .nx-grid-cols-4 {
+  .nx-grid-cols-4,
+  .nx-grid-cols-5 {
     grid-template-columns: 1fr;
   }
 

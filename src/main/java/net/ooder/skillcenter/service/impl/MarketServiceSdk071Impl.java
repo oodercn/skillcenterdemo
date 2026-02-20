@@ -1,10 +1,11 @@
 package net.ooder.skillcenter.service.impl;
 
-import net.ooder.sdk.api.skill.*;
 import net.ooder.skillcenter.config.SdkConfig;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.skillcenter.dto.SkillDTO;
 import net.ooder.skillcenter.dto.SkillReviewDTO;
+import net.ooder.skillcenter.manager.SkillManager;
+import net.ooder.skillcenter.model.Skill;
 import net.ooder.skillcenter.service.MarketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,7 @@ public class MarketServiceSdk071Impl implements MarketService {
     private static final Logger log = LoggerFactory.getLogger(MarketServiceSdk071Impl.class);
 
     private final SdkConfig sdkConfig;
-    private SkillDiscoverer skillDiscoverer;
-    private SkillRegistry skillRegistry;
+    private SkillManager skillManager;
     private final Map<String, List<SkillReviewDTO>> reviewStore = new ConcurrentHashMap<>();
     private final AtomicLong reviewIdGenerator = new AtomicLong(1);
 
@@ -35,28 +35,76 @@ public class MarketServiceSdk071Impl implements MarketService {
 
     @PostConstruct
     public void init() {
-        log.info("MarketService initialized with SDK 0.7.1");
+        skillManager = SkillManager.getInstance();
+        log.info("MarketService initialized with SDK 0.7.1 using SkillManager");
+    }
+
+    private List<SkillDTO> getSkillsFromManager() {
+        List<Skill> skills = skillManager.getAllSkills();
+        List<SkillDTO> result = new ArrayList<>();
+        
+        if (skills != null) {
+            for (Skill skill : skills) {
+                SkillDTO dto = new SkillDTO();
+                dto.setId(skill.getId());
+                dto.setName(skill.getName());
+                dto.setDescription(skill.getDescription());
+                dto.setVersion("1.0.0");
+                dto.setAvailable(skill.isAvailable());
+                
+                if (skill instanceof SkillManager.SkillInfo) {
+                    SkillManager.SkillInfo info = (SkillManager.SkillInfo) skill;
+                    dto.setCategory(info.getCategory());
+                    dto.setStatus(info.getStatus());
+                } else {
+                    dto.setCategory("general");
+                    dto.setStatus(skill.isAvailable() ? "active" : "inactive");
+                }
+                
+                dto.setDownloadCount(new Random().nextInt(500));
+                dto.setRating(3.0 + new Random().nextDouble() * 2.0);
+                result.add(dto);
+            }
+        }
+        return result;
     }
 
     @Override
     public PageResult<SkillDTO> getMarketSkills(int page, int size, String sortBy, String sortDirection) {
-        List<SkillDTO> skills = createMockSkills();
+        List<SkillDTO> skills = getSkillsFromManager();
         skills = sortSkills(skills, sortBy, sortDirection);
         return paginate(skills, page, size);
     }
 
     @Override
     public SkillDTO getSkillDetails(String skillId) {
-        List<SkillDTO> skills = createMockSkills();
-        return skills.stream()
-            .filter(s -> skillId.equals(s.getId()))
-            .findFirst()
-            .orElse(null);
+        Skill skill = skillManager.getSkill(skillId);
+        if (skill == null) {
+            return null;
+        }
+        
+        SkillDTO dto = new SkillDTO();
+        dto.setId(skill.getId());
+        dto.setName(skill.getName());
+        dto.setDescription(skill.getDescription());
+        dto.setVersion("1.0.0");
+        dto.setAvailable(skill.isAvailable());
+        
+        if (skill instanceof SkillManager.SkillInfo) {
+            SkillManager.SkillInfo info = (SkillManager.SkillInfo) skill;
+            dto.setCategory(info.getCategory());
+            dto.setStatus(info.getStatus());
+        } else {
+            dto.setCategory("general");
+            dto.setStatus(skill.isAvailable() ? "active" : "inactive");
+        }
+        
+        return dto;
     }
 
     @Override
     public PageResult<SkillDTO> searchSkills(String keyword, int page, int size, String sortBy, String sortDirection) {
-        List<SkillDTO> skills = createMockSkills();
+        List<SkillDTO> skills = getSkillsFromManager();
         if (keyword != null && !keyword.isEmpty()) {
             skills = skills.stream()
                 .filter(s -> s.getName().toLowerCase().contains(keyword.toLowerCase()) ||
@@ -69,12 +117,16 @@ public class MarketServiceSdk071Impl implements MarketService {
 
     @Override
     public List<String> getSkillCategories() {
-        return Arrays.asList("enterprise", "development", "integration", "infrastructure", "utilities");
+        List<SkillDTO> skills = getSkillsFromManager();
+        return skills.stream()
+            .map(SkillDTO::getCategory)
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     @Override
     public PageResult<SkillDTO> getSkillsByCategory(String category, int page, int size, String sortBy, String sortDirection) {
-        List<SkillDTO> skills = createMockSkills().stream()
+        List<SkillDTO> skills = getSkillsFromManager().stream()
             .filter(s -> category.equals(s.getCategory()))
             .collect(Collectors.toList());
         skills = sortSkills(skills, sortBy, sortDirection);
@@ -83,7 +135,7 @@ public class MarketServiceSdk071Impl implements MarketService {
 
     @Override
     public List<SkillDTO> getPopularSkills(int limit) {
-        return createMockSkills().stream()
+        return getSkillsFromManager().stream()
             .sorted((a, b) -> Integer.compare(b.getDownloadCount(), a.getDownloadCount()))
             .limit(limit)
             .collect(Collectors.toList());
@@ -91,7 +143,7 @@ public class MarketServiceSdk071Impl implements MarketService {
 
     @Override
     public List<SkillDTO> getLatestSkills(int limit) {
-        return createMockSkills().stream()
+        return getSkillsFromManager().stream()
             .limit(limit)
             .collect(Collectors.toList());
     }
@@ -118,12 +170,24 @@ public class MarketServiceSdk071Impl implements MarketService {
     @Override
     public byte[] downloadSkill(String skillId) {
         log.info("Download skill: {}", skillId);
-        return ("Mock skill data for " + skillId).getBytes();
+        Skill skill = skillManager.getSkill(skillId);
+        if (skill != null) {
+            return ("Skill data for " + skill.getName()).getBytes();
+        }
+        return ("Skill not found: " + skillId).getBytes();
     }
 
     @Override
     public boolean publishSkill(SkillDTO skill) {
         log.info("Publish skill: {}", skill.getName());
+        SkillManager.SkillInfo skillInfo = new SkillManager.SkillInfo();
+        skillInfo.setId(skill.getId());
+        skillInfo.setName(skill.getName());
+        skillInfo.setDescription(skill.getDescription());
+        skillInfo.setCategory(skill.getCategory() != null ? skill.getCategory() : "general");
+        skillInfo.setStatus("active");
+        skillInfo.setAvailable(true);
+        skillManager.registerSkill(skillInfo);
         return true;
     }
 
@@ -136,41 +200,8 @@ public class MarketServiceSdk071Impl implements MarketService {
     @Override
     public boolean deleteSkill(String skillId) {
         log.info("Delete skill: {}", skillId);
+        skillManager.unregisterSkill(skillId);
         return true;
-    }
-
-    private List<SkillDTO> createMockSkills() {
-        List<SkillDTO> skills = new ArrayList<>();
-        
-        SkillDTO skill1 = new SkillDTO();
-        skill1.setId("skill-001");
-        skill1.setName("Data Processing Skill");
-        skill1.setVersion("1.0.0");
-        skill1.setType("tool-skill");
-        skill1.setDescription("A skill for processing data");
-        skill1.setAuthor("Ooder Team");
-        skill1.setCategory("development");
-        skill1.setDownloadCount(150);
-        skill1.setRating(4.5);
-        skill1.setStatus("active");
-        skill1.setAvailable(true);
-        skills.add(skill1);
-        
-        SkillDTO skill2 = new SkillDTO();
-        skill2.setId("skill-002");
-        skill2.setName("API Integration Skill");
-        skill2.setVersion("2.1.0");
-        skill2.setType("integration-skill");
-        skill2.setDescription("A skill for API integration");
-        skill2.setAuthor("Ooder Team");
-        skill2.setCategory("integration");
-        skill2.setDownloadCount(280);
-        skill2.setRating(4.8);
-        skill2.setStatus("active");
-        skill2.setAvailable(true);
-        skills.add(skill2);
-        
-        return skills;
     }
 
     private List<SkillDTO> sortSkills(List<SkillDTO> skills, String sortBy, String sortDirection) {

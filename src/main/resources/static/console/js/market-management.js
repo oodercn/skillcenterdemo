@@ -216,7 +216,7 @@ window.openAddMarketSkillModal = function() {
     document.getElementById('skillStatus').value = 'active';
     document.getElementById('skillVersion').value = '1.0.0';
     document.getElementById('skillAuthor').value = 'System';
-    document.getElementById('skillModal').style.display = 'block';
+    document.getElementById('skillModal').style.display = 'flex';
 };
 
 // 打开编辑市场技能模态框
@@ -336,7 +336,7 @@ window.removeMarketSkill = async function(skillId) {
     console.log('[MarketManagement] 移除市场技能:', skillId);
 
     try {
-        const result = await utils.api.delete(`/market/skills/${skillId}`);
+        const result = await utils.api.post(`/api/market/skills/${skillId}/delete`);
         console.log('[MarketManagement] 移除市场技能响应:', result);
 
         if (result.success) {

@@ -66,41 +66,9 @@ function initExecutionTable() {
         },
         onError: (error) => {
             console.error('[Execution] 表格数据加载失败:', error);
-            // 如果API失败，加载模拟数据
-            loadMockExecutionData();
+            utils.message.error('加载执行历史失败: ' + error.message);
         }
     });
-}
-
-// 加载模拟执行数据（当API不可用时）
-function loadMockExecutionData() {
-    const mockData = [
-        {
-            executionId: 'exec-12345',
-            skillId: 'text-uppercase',
-            timestamp: new Date().toLocaleString('zh-CN'),
-            status: 'SUCCESS',
-            executionTime: '0.5s'
-        },
-        {
-            executionId: 'exec-12344',
-            skillId: 'code-generation',
-            timestamp: new Date(Date.now() - 3600000).toLocaleString('zh-CN'),
-            status: 'SUCCESS',
-            executionTime: '3.2s'
-        },
-        {
-            executionId: 'exec-12343',
-            skillId: 'local-deployment',
-            timestamp: new Date(Date.now() - 7200000).toLocaleString('zh-CN'),
-            status: 'FAILED',
-            executionTime: '1.8s'
-        }
-    ];
-
-    if (executionTable) {
-        executionTable.renderRows(mockData);
-    }
 }
 
 // 显示执行详情

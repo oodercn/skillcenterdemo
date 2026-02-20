@@ -86,7 +86,7 @@
         const configResponse = await fetch('/skillcenter/console/menu-config.json');
         if (configResponse.ok) {
           const config = await configResponse.json();
-          this.state.menuData = config.menu || [];
+          this.state.menuData = config.navigation || config.menu || [];
           console.log('[NexusMenu] 本地菜单数据:', this.state.menuData);
         } else {
           throw new Error('无法加载菜单配置');
@@ -113,8 +113,9 @@
       
       return items.map(item => {
         const hasChildren = item.children && item.children.length > 0;
-        const isActive = this._isCurrentPage(item.url);
-        const url = this._buildUrl(item.url);
+        const itemUrl = item.url || item.path;
+        const isActive = this._isCurrentPage(itemUrl);
+        const url = this._buildUrl(itemUrl);
         
         let html = `<li class="nav-item ${isActive ? 'active' : ''}" 
                         data-level="${level}" 

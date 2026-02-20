@@ -155,8 +155,12 @@ public class SceneGroupController extends BaseController {
         logRequestStart("handleFailover", request);
 
         try {
+            String failedMemberId = request.getFailedMemberId();
+            if (failedMemberId == null || failedMemberId.isEmpty()) {
+                failedMemberId = request.getNewPrimaryAgentId();
+            }
             boolean result = sceneGroupService.handleFailover(
-                request.getSceneGroupId(), request.getFailedMemberId());
+                request.getSceneGroupId(), failedMemberId);
             logRequestEnd("handleFailover", result, System.currentTimeMillis() - startTime);
             return ResultModel.success(result);
         } catch (Exception e) {
@@ -208,6 +212,39 @@ public class SceneGroupController extends BaseController {
         } catch (Exception e) {
             logRequestError("getVfsPermission", e);
             return ResultModel.error(500, "获取VFS权限失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/vfs/permissions")
+    public ResultModel<PageResult<VfsPermissionDTO>> listVfsPermissions(@RequestBody SceneGroupIdRequest request) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("listVfsPermissions", request);
+
+        try {
+            PageResult<VfsPermissionDTO> result = sceneGroupService.listVfsPermissions(
+                request.getSceneGroupId(), request.getPageNum(), request.getPageSize());
+            logRequestEnd("listVfsPermissions", result, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("listVfsPermissions", e);
+            return ResultModel.error(500, "获取VFS权限列表失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/vfs/permissions/add")
+    public ResultModel<VfsPermissionDTO> addVfsPermission(@RequestBody AddVfsPermissionRequest request) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("addVfsPermission", request);
+
+        try {
+            VfsPermissionDTO result = sceneGroupService.addVfsPermission(
+                request.getSceneGroupId(), request.getAgentId(), 
+                request.getPermissionType(), request.getPath());
+            logRequestEnd("addVfsPermission", result, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("addVfsPermission", e);
+            return ResultModel.error(500, "添加VFS权限失败: " + e.getMessage());
         }
     }
 
@@ -265,10 +302,13 @@ public class SceneGroupController extends BaseController {
     public static class FailoverRequest {
         private String sceneGroupId;
         private String failedMemberId;
+        private String newPrimaryAgentId;
         public String getSceneGroupId() { return sceneGroupId; }
         public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
         public String getFailedMemberId() { return failedMemberId; }
         public void setFailedMemberId(String failedMemberId) { this.failedMemberId = failedMemberId; }
+        public String getNewPrimaryAgentId() { return newPrimaryAgentId; }
+        public void setNewPrimaryAgentId(String newPrimaryAgentId) { this.newPrimaryAgentId = newPrimaryAgentId; }
     }
 
     public static class VfsPermissionRequest {
@@ -278,5 +318,20 @@ public class SceneGroupController extends BaseController {
         public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
         public String getAgentId() { return agentId; }
         public void setAgentId(String agentId) { this.agentId = agentId; }
+    }
+
+    public static class AddVfsPermissionRequest {
+        private String sceneGroupId;
+        private String agentId;
+        private String permissionType;
+        private String path;
+        public String getSceneGroupId() { return sceneGroupId; }
+        public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
+        public String getAgentId() { return agentId; }
+        public void setAgentId(String agentId) { this.agentId = agentId; }
+        public String getPermissionType() { return permissionType; }
+        public void setPermissionType(String permissionType) { this.permissionType = permissionType; }
+        public String getPath() { return path; }
+        public void setPath(String path) { this.path = path; }
     }
 }

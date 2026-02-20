@@ -21,7 +21,7 @@ async function renderSkillList() {
     skillList.innerHTML = '<div class="loading">加载中...</div>';
     
     try {
-        const data = await utils.api.get('/skills');
+        const data = await utils.api.post('/skills/list', { pageNum: 1, pageSize: 100 });
         console.log('[MySkill] 获取技能列表响应:', data);
         if (data.success && data.data) {
             const skills = data.data.content || data.data.items || [];
@@ -103,7 +103,7 @@ async function executeSkill(skillId) {
     utils.msg.show(`正在执行技能: ${skillId}...`, 'info');
     
     try {
-        const data = await utils.api.post(`/skills/${skillId}/execute`, {
+        const data = await utils.api.post(`/api/skills/${skillId}/execute`, {
             parameters: {},
             attributes: {}
         });
@@ -123,7 +123,7 @@ async function executeSkill(skillId) {
 // 打开更新模态框
 async function openUpdateModal(skillId) {
     try {
-        const data = await utils.api.get(`/skills/${skillId}`);
+        const data = await utils.api.post('/skills/get', { skillId: skillId });
         if (data.success && data.data) {
             const skill = data.data;
             document.getElementById('update-skill-id').value = skill.id;
@@ -146,7 +146,7 @@ async function openUpdateModal(skillId) {
 async function deleteSkill(skillId) {
     if (confirm('确定要删除这个技能吗？')) {
         try {
-            const data = await utils.api.delete(`/skills/${skillId}`);
+            const data = await utils.api.post('/skills/delete', { skillId: skillId });
             if (data.success) {
                 renderSkillList();
                 utils.msg.show('技能删除成功！', 'success');
@@ -214,7 +214,7 @@ function bindMySkillPageEvents() {
                 };
                 
                 try {
-                    const data = await utils.api.post('/skills', newSkill);
+                    const data = await utils.api.post('/skills/add', newSkill);
                     if (data.success) {
                         renderSkillList();
                         utils.modal.hide('publish-modal');
@@ -263,7 +263,7 @@ function bindMySkillPageEvents() {
                 };
                 
                 try {
-                    const data = await utils.api.put(`/skills/${skillId}`, updatedSkill);
+                    const data = await utils.api.post('/skills/update', { skillId: skillId, ...updatedSkill });
                     if (data.success) {
                         renderSkillList();
                         utils.modal.hide('update-modal');

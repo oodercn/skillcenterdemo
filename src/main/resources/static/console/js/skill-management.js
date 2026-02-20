@@ -243,7 +243,7 @@ window.saveSkill = async function() {
         if (skillId) {
             // 编辑现有技能
             console.log('[SkillManagement] 更新技能:', skillId);
-            result = await utils.api.put(`/admin/skills/${skillId}`, skillData);
+            result = await utils.api.post(`/api/admin/skills/${skillId}/update`, skillData);
         } else {
             // 添加新技能
             console.log('[SkillManagement] 创建新技能');
@@ -303,7 +303,7 @@ function openAddSkillModal() {
 async function editSkill(skillId) {
     console.log('[SkillManagement] 编辑技能:', skillId);
     try {
-        const data = await utils.api.get(`/admin/skills/${skillId}`);
+        const data = await utils.api.post('/admin/skills/get', { skillId: skillId });
         console.log('[SkillManagement] 获取技能详情响应:', data);
 
         if (data.success && data.data) {
@@ -341,7 +341,7 @@ function closeSkillModal() {
 async function approveSkill(skillId) {
     console.log('[SkillManagement] 审核技能:', skillId);
     try {
-        const result = await utils.api.post(`/admin/skills/${skillId}/approve`);
+        const result = await utils.api.post(`/api/admin/skills/${skillId}/approve`);
         console.log('[SkillManagement] 审核技能响应:', result);
 
         if (result.success) {
@@ -364,7 +364,7 @@ async function deleteSkill(skillId) {
     if (utils.msg.confirm('确定要删除这个技能吗？')) {
         console.log('[SkillManagement] 删除技能:', skillId);
         try {
-            const result = await utils.api.delete(`/admin/skills/${skillId}`);
+            const result = await utils.api.post(`/api/admin/skills/${skillId}/delete`);
             console.log('[SkillManagement] 删除技能响应:', result);
 
             if (result.success) {

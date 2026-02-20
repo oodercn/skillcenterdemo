@@ -15,14 +15,14 @@
     <artifactId>agent-skillcenter</artifactId>
     <version>2.1</version>
     <name>Agent Skill Center</name>
-    <description>Skill Center for Ooder Super Agent - Version 2.2 with v0.7.1 Protocol Support</description>
+    <description>Skill Center for Ooder Super Agent - Version 2.2 with v0.7.2 Protocol Support</description>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fastjson.version>1.2.83</fastjson.version>
-        <agent-sdk.version>0.7.1</agent-sdk.version>
-        <ooder-core.version>2.0</ooder-core.version>
+        <agent-sdk.version>0.7.3</agent-sdk.version>
+        <ooder-core.version>2.2</ooder-core.version>
     </properties>
 
     <repositories>
@@ -52,30 +52,22 @@
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk</artifactId>
             <version>${agent-sdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/agent-sdk-0.7.1.jar</systemPath>
         </dependency>
         
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-common-client</artifactId>
             <version>${ooder-core.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ooder-common-client-1.0.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-server</artifactId>
             <version>${ooder-core.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ooder-server-1.0.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-vfs-web</artifactId>
             <version>${ooder-core.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ooder-vfs-web-1.0.1.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -109,6 +101,18 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>5.12.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-server-mock</artifactId>
+            <version>5.12.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

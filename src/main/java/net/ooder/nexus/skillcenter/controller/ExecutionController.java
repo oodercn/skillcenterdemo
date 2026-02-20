@@ -10,11 +10,15 @@ import net.ooder.nexus.skillcenter.model.ResultModel;
 import net.ooder.nexus.skillcenter.dto.execution.ExecuteSkillRequestDTO;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,12 +30,16 @@ public class ExecutionController extends BaseController {
     private final SkillManager skillManager;
     private final SkillExecutionMonitor executionMonitor;
     private final Map<String, SkillResult> executionResults;
+    private final Map<String, Future<?>> executionFutures;
+    private final Map<String, String> executionStatus;
     private final ExecutorService executorService;
 
     public ExecutionController() {
         this.skillManager = SkillManager.getInstance();
         this.executionMonitor = new SkillExecutionMonitor();
         this.executionResults = new ConcurrentHashMap<>();
+        this.executionFutures = new ConcurrentHashMap<>();
+        this.executionStatus = new ConcurrentHashMap<>();
         this.executorService = Executors.newFixedThreadPool(10, new SkillExecutionThreadFactory());
     }
 
@@ -124,8 +132,9 @@ public class ExecutionController extends BaseController {
         String executionId = UUID.randomUUID().toString();
 
         executionMonitor.onExecutionStart(executionId, skillId);
+        executionStatus.put(executionId, "RUNNING");
 
-        executorService.submit(() -> {
+        Future<?> future = executorService.submit(() -> {
             try {
                 SkillContext context = new SkillContext();
                 if (request.getParameters() != null) {
@@ -134,20 +143,29 @@ public class ExecutionController extends BaseController {
                     }
                 }
 
+                if ("CANCELLED".equals(executionStatus.get(executionId))) {
+                    SkillResult result = new SkillResult(SkillResult.Status.FAILED, "Execution cancelled");
+                    executionResults.put(executionId, result);
+                    return;
+                }
+
                 SkillResult result = skillManager.executeSkill(skillId, context);
                 executionResults.put(executionId, result);
+                executionStatus.put(executionId, "SUCCESS");
 
                 executionMonitor.onExecutionSuccess(executionId, skillId, result);
             } catch (SkillException e) {
                 SkillResult result = new SkillResult(SkillResult.Status.FAILED, e.getMessage());
                 result.setException(e);
                 executionResults.put(executionId, result);
+                executionStatus.put(executionId, "FAILED");
 
                 executionMonitor.onExecutionFailure(executionId, skillId, e);
             } catch (Exception e) {
                 SkillResult result = new SkillResult(SkillResult.Status.FAILED, e.getMessage());
                 result.setException(e);
                 executionResults.put(executionId, result);
+                executionStatus.put(executionId, "FAILED");
 
                 if (e instanceof net.ooder.skillcenter.model.SkillException) {
                     executionMonitor.onExecutionFailure(executionId, skillId, (net.ooder.skillcenter.model.SkillException) e);
@@ -156,6 +174,8 @@ public class ExecutionController extends BaseController {
                 }
             }
         });
+
+        executionFutures.put(executionId, future);
 
         logRequestEnd("executeSkillAsync", executionId, System.currentTimeMillis() - startTime);
         return ResultModel.success(executionId);
@@ -186,20 +206,73 @@ public class ExecutionController extends BaseController {
         logRequestStart("getExecutionStatus", executionId);
 
         try {
-            SkillResult result = executionResults.get(executionId);
-            String status;
-            if (result == null) {
-                status = "PENDING";
-            } else if (result.getStatus() == SkillResult.Status.SUCCESS) {
-                status = "SUCCESS";
-            } else {
-                status = "FAILED";
+            String status = executionStatus.get(executionId);
+            if (status == null) {
+                status = "UNKNOWN";
             }
             logRequestEnd("getExecutionStatus", status, System.currentTimeMillis() - startTime);
             return ResultModel.success(status);
         } catch (Exception e) {
             logRequestError("getExecutionStatus", e);
             return ResultModel.error(500, "获取执行状态失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/cancel/{executionId}")
+    public ResultModel<Boolean> cancelExecution(@PathVariable String executionId) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("cancelExecution", executionId);
+
+        try {
+            String status = executionStatus.get(executionId);
+            if (status == null) {
+                return ResultModel.notFound("执行任务不存在");
+            }
+
+            if ("SUCCESS".equals(status) || "FAILED".equals(status) || "CANCELLED".equals(status)) {
+                return ResultModel.error(400, "执行已完成，无法取消");
+            }
+
+            Future<?> future = executionFutures.get(executionId);
+            if (future != null && !future.isDone()) {
+                future.cancel(true);
+            }
+
+            executionStatus.put(executionId, "CANCELLED");
+            
+            SkillResult result = new SkillResult(SkillResult.Status.FAILED, "Execution cancelled by user");
+            executionResults.put(executionId, result);
+
+            logRequestEnd("cancelExecution", true, System.currentTimeMillis() - startTime);
+            return ResultModel.success("执行已取消", true);
+        } catch (Exception e) {
+            logRequestError("cancelExecution", e);
+            return ResultModel.error(500, "取消执行失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/list-running")
+    public ResultModel<List<Map<String, Object>>> listRunningExecutions() {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("listRunningExecutions", null);
+
+        try {
+            List<Map<String, Object>> runningList = new ArrayList<>();
+            
+            for (Map.Entry<String, String> entry : executionStatus.entrySet()) {
+                if ("RUNNING".equals(entry.getValue())) {
+                    Map<String, Object> info = new HashMap<>();
+                    info.put("executionId", entry.getKey());
+                    info.put("status", entry.getValue());
+                    runningList.add(info);
+                }
+            }
+
+            logRequestEnd("listRunningExecutions", runningList.size() + " running", System.currentTimeMillis() - startTime);
+            return ResultModel.success(runningList);
+        } catch (Exception e) {
+            logRequestError("listRunningExecutions", e);
+            return ResultModel.error(500, "获取运行中执行列表失败: " + e.getMessage());
         }
     }
 

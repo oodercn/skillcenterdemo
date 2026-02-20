@@ -385,10 +385,14 @@ th {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
 }
 
 .modal-content {
@@ -1090,6 +1094,7 @@ th {
 }
 
 .nexus-modal,
+.nx-modal,
 .modal {
     position: fixed;
     top: 0;
@@ -1097,13 +1102,20 @@ th {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 }
 
+.nexus-modal.show,
+.nx-modal.show,
+.modal.show {
+    display: flex;
+}
+
 .nexus-modal-content,
+.nx-modal__content,
 .modal-content {
     background-color: var(--nexus-card-bg);
     border-radius: var(--nexus-radius);
@@ -1115,6 +1127,7 @@ th {
 }
 
 .nexus-modal-header,
+.nx-modal__header,
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -1124,6 +1137,7 @@ th {
 }
 
 .nexus-modal-title,
+.nx-modal__title,
 .modal-title {
     font-size: 18px;
     font-weight: 600;
@@ -1132,6 +1146,7 @@ th {
 }
 
 .nexus-modal-close,
+.nx-modal__close,
 .modal-close {
     background: none;
     border: none;
@@ -1149,23 +1164,35 @@ th {
 }
 
 .nexus-modal-close:hover,
+.nx-modal__close:hover,
 .modal-close:hover {
     background-color: var(--nexus-light);
     color: var(--nexus-dark);
 }
 
 .nexus-modal-body,
+.nx-modal__body,
 .modal-body {
     padding: 24px;
 }
 
 .nexus-modal-footer,
+.nx-modal__footer,
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
     padding: 16px 24px;
     border-top: 1px solid var(--nexus-border);
+}
+
+.nx-modal__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
 }
 
 .nexus-table,

@@ -7,7 +7,7 @@
  */
 async function loadMenuConfig() {
     try {
-        const response = await fetch('menu-config.json');
+        const response = await fetch('/skillcenter/console/menu-config.json');
         if (!response.ok) {
             throw new Error('菜单配置加载失败');
         }
@@ -15,7 +15,6 @@ async function loadMenuConfig() {
         renderMenu();
     } catch (error) {
         console.error('加载菜单配置错误:', error);
-        // 加载失败时显示默认菜单
         renderDefaultMenu();
     }
 }
@@ -29,10 +28,10 @@ function renderMenu() {
     
     navMenu.innerHTML = '';
     
-    COMMON.menuConfig.menu.forEach(item => {
+    const menuItems = COMMON.menuConfig.navigation || COMMON.menuConfig.menu || [];
+    menuItems.forEach(item => {
         const menuItem = createMenuItem(item);
         navMenu.appendChild(menuItem);
-        // 添加菜单分隔线
         if (item.id !== 'dashboard') {
             const divider = document.createElement('div');
             divider.className = 'menu-divider';
@@ -52,7 +51,6 @@ function createMenuItem(menuItem) {
     const li = document.createElement('li');
     
     if (menuItem.children && menuItem.children.length > 0) {
-        // 有子菜单的菜单项
         const a = document.createElement('a');
         a.href = `#${menuItem.id}`;
         a.innerHTML = `
@@ -61,7 +59,6 @@ function createMenuItem(menuItem) {
             <span class="toggle-icon">›</span>
         `;
         
-        // 处理点击事件
         a.addEventListener('click', function(e) {
             e.preventDefault();
             const toggleIcon = this.querySelector('.toggle-icon');
@@ -75,7 +72,6 @@ function createMenuItem(menuItem) {
         
         li.appendChild(a);
         
-        // 创建子菜单
         const submenu = document.createElement('ul');
         submenu.className = 'submenu';
         
@@ -84,15 +80,14 @@ function createMenuItem(menuItem) {
             submenu.appendChild(childLi);
         });
         
-        // 只有当子菜单不为空时才添加
         if (submenu.children.length > 0) {
             li.appendChild(submenu);
         }
     } else {
-        // 无子菜单的菜单项
         const a = document.createElement('a');
-        if (menuItem.url) {
-            a.href = menuItem.url;
+        const url = menuItem.url || menuItem.path;
+        if (url) {
+            a.href = url;
         } else {
             a.href = `#${menuItem.id}`;
             a.setAttribute('data-page', menuItem.page || menuItem.id);
@@ -102,7 +97,6 @@ function createMenuItem(menuItem) {
             ${menuItem.name}
         `;
         
-        // 检查是否已实现
         if (menuItem.status !== 'implemented' && menuItem.id !== 'dashboard') {
             a.classList.add('disabled');
             a.title = '功能开发中，敬请期待';

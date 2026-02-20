@@ -17,9 +17,8 @@ public class MarketController extends BaseController {
 
     private final SkillMarketManager marketManager;
 
-    @Autowired
-    public MarketController(SkillMarketManager marketManager) {
-        this.marketManager = marketManager;
+    public MarketController() {
+        this.marketManager = SkillMarketManager.getInstance();
     }
 
     @PostMapping("/skills")

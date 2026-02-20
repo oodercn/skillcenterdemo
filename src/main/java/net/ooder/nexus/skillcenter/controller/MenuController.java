@@ -46,7 +46,13 @@ public class MenuController {
     private List<MenuItemDTO> parseMenuData(String jsonContent) {
         try {
             Map<String, Object> config = objectMapper.readValue(jsonContent, Map.class);
-            List<Map<String, Object>> menuList = (List<Map<String, Object>>) config.get("menu");
+            List<Map<String, Object>> menuList = (List<Map<String, Object>>) config.get("navigation");
+            if (menuList == null) {
+                menuList = (List<Map<String, Object>>) config.get("menu");
+            }
+            if (menuList == null) {
+                return java.util.Collections.emptyList();
+            }
             return menuList.stream()
                 .map(this::mapToMenuItemDTO)
                 .collect(Collectors.toList());
@@ -61,7 +67,11 @@ public class MenuController {
         dto.setId((String) map.get("id"));
         dto.setName((String) map.get("name"));
         dto.setIcon((String) map.get("icon"));
-        dto.setUrl((String) map.get("url"));
+        String url = (String) map.get("url");
+        if (url == null) {
+            url = (String) map.get("path");
+        }
+        dto.setUrl(url);
         
         List<String> roles = (List<String>) map.get("roles");
         dto.setRoles(roles);

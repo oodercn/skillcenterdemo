@@ -104,7 +104,7 @@ window.searchUsers = async function() {
     if (keyword) {
         console.log('[UserManagement] 搜索用户:', keyword);
         try {
-            const result = await utils.api.post('/api/admin/users/search', { 
+            const result = await utils.api.post('/admin/users/search', { 
                 keyword: keyword 
             });
             if (result.code === 200 && result.data) {
@@ -142,14 +142,14 @@ window.openAddUserModal = function() {
     if (email) email.value = '';
     if (role) role.value = 'user';
     if (status) status.value = 'active';
-    if (userModal) userModal.style.display = 'block';
+    if (userModal) userModal.style.display = 'flex';
 };
 
 window.editUser = async function(userId) {
     console.log('[UserManagement] 编辑用户:', userId);
     
     try {
-        const result = await utils.api.post('/api/admin/users/search', { keyword: userId });
+        const result = await utils.api.post('/admin/users/search', { keyword: userId });
         
         if (result.code === 200 && result.data) {
             const users = result.data.items || result.data;
@@ -248,7 +248,7 @@ window.submitUserForm = async function() {
             result = await utils.api.post(`/api/admin/users/${userId}/update`, userData);
         } else {
             console.log('[UserManagement] 创建用户');
-            result = await utils.api.post('/api/admin/users/add', userData);
+            result = await utils.api.post('/admin/users/add', userData);
         }
 
         if (submitBtn) {

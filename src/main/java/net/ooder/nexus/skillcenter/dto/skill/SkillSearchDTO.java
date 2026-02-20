@@ -11,6 +11,7 @@ public class SkillSearchDTO {
     private List<String> scenes;
     private List<String> types;
     private List<String> keywords;
+    private List<String> sources;
     private String version;
     private int pageNum = 1;
     private int pageSize = 20;
@@ -47,6 +48,14 @@ public class SkillSearchDTO {
 
     public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
+    }
+
+    public List<String> getSources() {
+        return sources;
+    }
+
+    public void setSources(List<String> sources) {
+        this.sources = sources;
     }
 
     public String getVersion() {

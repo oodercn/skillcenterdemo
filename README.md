@@ -106,11 +106,6 @@ API 基础路径: `/skillcenter/api`
 
 完整 API 文档请参考 [API规范文档.md](API规范文档.md)
 
-## 开发文档
-
-- [综合设计文档](SKILLCENTER_COMPREHENSIVE_DESIGN.md)
-- [功能模块说明](FUNCTION_MODULES.md)
-
 ## 许可证
 
 本项目采用 [MIT 许可证](LICENSE) 开源。

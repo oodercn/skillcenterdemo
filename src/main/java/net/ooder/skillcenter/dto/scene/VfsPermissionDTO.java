@@ -8,6 +8,9 @@ public class VfsPermissionDTO {
     private List<String> readablePaths;
     private List<String> writablePaths;
     private boolean fullAccess;
+    private String permissionType;
+    private String path;
+    private String status;
 
     public String getAgentId() { return agentId; }
     public void setAgentId(String agentId) { this.agentId = agentId; }
@@ -19,4 +22,10 @@ public class VfsPermissionDTO {
     public void setWritablePaths(List<String> writablePaths) { this.writablePaths = writablePaths; }
     public boolean isFullAccess() { return fullAccess; }
     public void setFullAccess(boolean fullAccess) { this.fullAccess = fullAccess; }
+    public String getPermissionType() { return permissionType; }
+    public void setPermissionType(String permissionType) { this.permissionType = permissionType; }
+    public String getPath() { return path; }
+    public void setPath(String path) { this.path = path; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

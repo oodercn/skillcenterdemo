@@ -40,6 +40,9 @@
                         <div class="nx-card__header nx-flex nx-justify-between nx-items-center">
                             <h3 class="nx-card__title">场景组列表</h3>
                             <div class="nx-flex nx-gap-3">
+                                <button class="nx-btn nx-btn--primary" onclick="openJoinModal()">
+                                    <i class="ri-login-box-line"></i> 加入场景组
+                                </button>
                                 <button class="nx-btn nx-btn--success" onclick="openCreateModal()">
                                     <i class="ri-add-line"></i> 创建场景组
                                 </button>
@@ -96,6 +99,11 @@
                     <label class="nx-label">心跳超时(ms)</label>
                     <input type="number" id="createHeartbeatTimeout" class="nx-input" value="15000">
                 </div>
+                <div class="nx-form-group nx-mb-4">
+                    <label class="nx-label">密钥阈值</label>
+                    <input type="number" id="createKeyThreshold" class="nx-input" value="2" min="1" max="10">
+                    <span class="nx-text-sm nx-text-muted">用于分布式密钥分片的阈值</span>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="nx-btn nx-btn--ghost" onclick="closeCreateModal()">取消</button>
@@ -127,6 +135,62 @@
             </div>
             <div class="modal-footer">
                 <button class="nx-btn nx-btn--ghost" onclick="closeMemberModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="keyManagementModal" class="modal" style="display: none;">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h3>密钥管理</h3>
+                <button class="modal-close" onclick="closeKeyManagementModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="nx-mb-4">
+                    <h4 class="nx-text-sm nx-font-semibold nx-mb-2">当前密钥状态</h4>
+                    <div id="keyStatus" class="nx-text-secondary">加载中...</div>
+                </div>
+                <div class="nx-mb-4">
+                    <h4 class="nx-text-sm nx-font-semibold nx-mb-2">密钥分片</h4>
+                    <div id="keyShares">
+                        <div class="nx-text-secondary">暂无密钥分片</div>
+                    </div>
+                </div>
+                <div class="nx-divider nx-my-4"></div>
+                <div class="nx-form-group nx-mb-4">
+                    <label class="nx-label">新密钥阈值</label>
+                    <input type="number" id="newKeyThreshold" class="nx-input" value="2" min="1" max="10">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--ghost" onclick="closeKeyManagementModal()">关闭</button>
+                <button class="nx-btn nx-btn--primary" onclick="generateKey(currentSceneGroupId)">
+                    <i class="ri-key-line"></i> 生成新密钥
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="joinModal" class="modal" style="display: none;">
+        <div class="modal-backdrop" onclick="closeJoinModal()"></div>
+        <div class="modal-content" style="width: 400px;">
+            <div class="modal-header">
+                <h3>加入场景组</h3>
+                <button class="modal-close" onclick="closeJoinModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="nx-form-group nx-mb-4">
+                    <label class="nx-label">场景组ID</label>
+                    <input type="text" id="joinGroupId" class="nx-input" placeholder="输入要加入的场景组ID">
+                </div>
+                <div class="nx-form-group nx-mb-4">
+                    <label class="nx-label">代理ID</label>
+                    <input type="text" id="joinAgentId" class="nx-input" placeholder="输入代理ID">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--ghost" onclick="closeJoinModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="submitJoin()">加入</button>
             </div>
         </div>
     </div>

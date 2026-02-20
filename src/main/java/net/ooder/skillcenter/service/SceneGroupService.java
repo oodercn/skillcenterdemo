@@ -44,4 +44,8 @@ public interface SceneGroupService {
     boolean distributeKeyShares(String sceneGroupId, SceneGroupKeyDTO key);
     
     VfsPermissionDTO getVfsPermission(String sceneGroupId, String agentId);
+    
+    PageResult<VfsPermissionDTO> listVfsPermissions(String sceneGroupId, int pageNum, int pageSize);
+    
+    VfsPermissionDTO addVfsPermission(String sceneGroupId, String agentId, String permissionType, String path);
 }

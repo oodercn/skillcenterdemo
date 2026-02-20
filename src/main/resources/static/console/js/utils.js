@@ -92,7 +92,7 @@ if (typeof modal === 'undefined') {
             const modalElement = document.getElementById(modalId);
             console.log('[Utils.modal] 找到元素:', modalElement);
             if (modalElement) {
-                modalElement.style.display = 'block';
+                modalElement.style.display = 'flex';
                 console.log('[Utils.modal] 模态框已显示');
             } else {
                 console.error('[Utils.modal] 未找到模态框元素:', modalId);
