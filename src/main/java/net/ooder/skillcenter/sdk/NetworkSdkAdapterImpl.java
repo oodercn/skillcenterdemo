@@ -1,5 +1,6 @@
 package net.ooder.skillcenter.sdk;
 
+import net.ooder.scene.provider.*;
 import net.ooder.skillcenter.config.SdkConfig;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.nexus.skillcenter.dto.network.NetworkLinkDTO;
@@ -30,6 +31,7 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
     @Autowired
     private SceneEngineAdapter sceneEngineAdapter;
 
+    private NetworkProvider networkProvider;
     private boolean sdkAvailable = false;
 
     @PostConstruct
@@ -43,30 +45,36 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
         sdkAvailable = sceneEngineAdapter.isAvailable();
 
         if (sdkAvailable) {
-            log.info("[NetworkSdkAdapter] SDK is available, using real implementation");
+            networkProvider = sceneEngineAdapter.getNetworkProvider();
+            if (networkProvider != null) {
+                log.info("[NetworkSdkAdapter] NetworkProvider available, using real implementation");
+            } else {
+                sdkAvailable = false;
+                log.warn("[NetworkSdkAdapter] NetworkProvider not available, falling back to mock");
+            }
         } else {
-            log.warn("[NetworkSdkAdapter] SDK network APIs not available, falling back to mock");
+            log.warn("[NetworkSdkAdapter] SDK not available, falling back to mock");
         }
     }
 
     @Override
     public Map<String, Object> getNetworkStatus() {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getNetworkStatus();
         }
 
-        log.debug("[NetworkSdkAdapter] Getting network status via SDK");
         try {
-            Map<String, Object> status = new HashMap<>();
-            status.put("status", "在线");
-            status.put("nodeId", sdkConfig.getAgentId());
-            status.put("nodeType", "SkillCenter");
-            status.put("online", true);
-            status.put("connectedPeers", 0);
-            status.put("localAddress", sdkConfig.getEndpoint());
-            status.put("localPort", sdkConfig.getUdpPort());
-            status.put("uptime", System.currentTimeMillis() - 3600000L);
-            return status;
+            NetworkStatus status = networkProvider.getStatus();
+            Map<String, Object> result = new HashMap<>();
+            result.put("status", status.getStatus());
+            result.put("nodeId", status.getNodeId());
+            result.put("nodeType", status.getNodeType());
+            result.put("online", status.isOnline());
+            result.put("connectedPeers", status.getConnectedPeers());
+            result.put("localAddress", status.getLocalAddress());
+            result.put("localPort", status.getLocalPort());
+            result.put("uptime", status.getUptime());
+            return result;
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get network status: {}", e.getMessage());
             return mockAdapter.getNetworkStatus();
@@ -75,13 +83,23 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public Map<String, Object> getNetworkStats() {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getNetworkStats();
         }
 
-        log.debug("[NetworkSdkAdapter] Getting network stats via SDK");
         try {
-            return mockAdapter.getNetworkStats();
+            NetworkStats stats = networkProvider.getStats();
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalLinks", stats.getTotalLinks());
+            result.put("activeLinks", stats.getActiveLinks());
+            result.put("totalRoutes", stats.getTotalRoutes());
+            result.put("activeRoutes", stats.getActiveRoutes());
+            result.put("bytesSent", stats.getBytesSent());
+            result.put("bytesReceived", stats.getBytesReceived());
+            result.put("messagesSent", stats.getMessagesSent());
+            result.put("messagesReceived", stats.getMessagesReceived());
+            result.put("averageLatency", stats.getAverageLatency());
+            return result;
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get network stats: {}", e.getMessage());
             return mockAdapter.getNetworkStats();
@@ -90,13 +108,17 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public PageResult<NetworkLinkDTO> getLinks(int pageNum, int pageSize) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getLinks(pageNum, pageSize);
         }
 
-        log.debug("[NetworkSdkAdapter] Getting links via SDK: page={}, size={}", pageNum, pageSize);
         try {
-            return mockAdapter.getLinks(pageNum, pageSize);
+            net.ooder.scene.core.PageResult<NetworkLink> result = networkProvider.listLinks(pageNum, pageSize);
+            List<NetworkLinkDTO> dtoList = new ArrayList<>();
+            for (NetworkLink link : result.getList()) {
+                dtoList.add(convertLinkToDTO(link));
+            }
+            return new PageResult<>(dtoList, result.getTotal(), result.getPageNum(), result.getPageSize());
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get links: {}", e.getMessage());
             return mockAdapter.getLinks(pageNum, pageSize);
@@ -105,13 +127,13 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public NetworkLinkDTO getLinkById(String linkId) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getLinkById(linkId);
         }
 
-        log.debug("[NetworkSdkAdapter] Getting link via SDK: {}", linkId);
         try {
-            return mockAdapter.getLinkById(linkId);
+            NetworkLink link = networkProvider.getLink(linkId);
+            return link != null ? convertLinkToDTO(link) : null;
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get link: {}", e.getMessage());
             return mockAdapter.getLinkById(linkId);
@@ -120,13 +142,12 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public boolean disconnectLink(String linkId) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.disconnectLink(linkId);
         }
 
-        log.debug("[NetworkSdkAdapter] Disconnecting link via SDK: {}", linkId);
         try {
-            return mockAdapter.disconnectLink(linkId);
+            return networkProvider.disconnectLink(linkId);
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to disconnect link: {}", e.getMessage());
             return mockAdapter.disconnectLink(linkId);
@@ -135,13 +156,12 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public boolean reconnectLink(String linkId) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.reconnectLink(linkId);
         }
 
-        log.debug("[NetworkSdkAdapter] Reconnecting link via SDK: {}", linkId);
         try {
-            return mockAdapter.reconnectLink(linkId);
+            return networkProvider.reconnectLink(linkId);
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to reconnect link: {}", e.getMessage());
             return mockAdapter.reconnectLink(linkId);
@@ -150,13 +170,17 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public PageResult<NetworkRouteDTO> getRoutes(int pageNum, int pageSize) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getRoutes(pageNum, pageSize);
         }
 
-        log.debug("[NetworkSdkAdapter] Getting routes via SDK: page={}, size={}", pageNum, pageSize);
         try {
-            return mockAdapter.getRoutes(pageNum, pageSize);
+            net.ooder.scene.core.PageResult<NetworkRoute> result = networkProvider.listRoutes(pageNum, pageSize);
+            List<NetworkRouteDTO> dtoList = new ArrayList<>();
+            for (NetworkRoute route : result.getList()) {
+                dtoList.add(convertRouteToDTO(route));
+            }
+            return new PageResult<>(dtoList, result.getTotal(), result.getPageNum(), result.getPageSize());
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get routes: {}", e.getMessage());
             return mockAdapter.getRoutes(pageNum, pageSize);
@@ -165,13 +189,13 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public NetworkRouteDTO getRouteById(String routeId) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getRouteById(routeId);
         }
 
-        log.debug("[NetworkSdkAdapter] Getting route via SDK: {}", routeId);
         try {
-            return mockAdapter.getRouteById(routeId);
+            NetworkRoute route = networkProvider.getRoute(routeId);
+            return route != null ? convertRouteToDTO(route) : null;
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get route: {}", e.getMessage());
             return mockAdapter.getRouteById(routeId);
@@ -180,13 +204,13 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public NetworkRouteDTO findRoute(String sourceNode, String targetNode, String algorithm, int maxHops) {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.findRoute(sourceNode, targetNode, algorithm, maxHops);
         }
 
-        log.debug("[NetworkSdkAdapter] Finding route via SDK: {} -> {}", sourceNode, targetNode);
         try {
-            return mockAdapter.findRoute(sourceNode, targetNode, algorithm, maxHops);
+            NetworkRoute route = networkProvider.findRoute(sourceNode, targetNode, algorithm, maxHops);
+            return route != null ? convertRouteToDTO(route) : null;
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to find route: {}", e.getMessage());
             return mockAdapter.findRoute(sourceNode, targetNode, algorithm, maxHops);
@@ -195,13 +219,13 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public NetworkTopologyDTO getTopology() {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getTopology();
         }
 
-        log.debug("[NetworkSdkAdapter] Getting topology via SDK");
         try {
-            return mockAdapter.getTopology();
+            NetworkTopology topology = networkProvider.getTopology();
+            return convertTopologyToDTO(topology);
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get topology: {}", e.getMessage());
             return mockAdapter.getTopology();
@@ -210,13 +234,13 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
 
     @Override
     public NetworkQualityDTO getQuality() {
-        if (!sdkAvailable) {
+        if (!sdkAvailable || networkProvider == null) {
             return mockAdapter.getQuality();
         }
 
-        log.debug("[NetworkSdkAdapter] Getting quality via SDK");
         try {
-            return mockAdapter.getQuality();
+            NetworkQuality quality = networkProvider.getQuality();
+            return convertQualityToDTO(quality);
         } catch (Exception e) {
             log.error("[NetworkSdkAdapter] Failed to get quality: {}", e.getMessage());
             return mockAdapter.getQuality();
@@ -226,5 +250,51 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
     @Override
     public boolean isAvailable() {
         return sdkAvailable || mockAdapter.isAvailable();
+    }
+
+    private NetworkLinkDTO convertLinkToDTO(NetworkLink link) {
+        NetworkLinkDTO dto = new NetworkLinkDTO();
+        dto.setLinkId(link.getLinkId());
+        dto.setSourceNode(link.getSourceNode());
+        dto.setTargetNode(link.getTargetNode());
+        dto.setLinkType(link.getLinkType());
+        dto.setStatus(link.getStatus());
+        dto.setLatency(link.getLatency());
+        dto.setBandwidth(link.getBandwidth());
+        dto.setEstablishedAt(link.getEstablishedAt());
+        dto.setLastActive(link.getLastActive());
+        return dto;
+    }
+
+    private NetworkRouteDTO convertRouteToDTO(NetworkRoute route) {
+        NetworkRouteDTO dto = new NetworkRouteDTO();
+        dto.setRouteId(route.getRouteId());
+        dto.setSourceNode(route.getSourceNode());
+        dto.setTargetNode(route.getTargetNode());
+        dto.setHops(route.getHops());
+        dto.setTotalLatency(route.getTotalLatency());
+        dto.setHopCount(route.getHopCount());
+        dto.setStatus(route.getStatus());
+        dto.setRouteType(route.getRouteType());
+        return dto;
+    }
+
+    private NetworkTopologyDTO convertTopologyToDTO(NetworkTopology topology) {
+        NetworkTopologyDTO dto = new NetworkTopologyDTO();
+        dto.setNodes(topology.getNodes());
+        dto.setEdges(topology.getEdges());
+        dto.setUpdatedAt(topology.getUpdatedAt());
+        return dto;
+    }
+
+    private NetworkQualityDTO convertQualityToDTO(NetworkQuality quality) {
+        NetworkQualityDTO dto = new NetworkQualityDTO();
+        dto.setOverallScore(quality.getOverallScore());
+        dto.setLatencyScore(quality.getLatencyScore());
+        dto.setBandwidthScore(quality.getBandwidthScore());
+        dto.setStabilityScore(quality.getStabilityScore());
+        dto.setPacketLoss(quality.getPacketLoss());
+        dto.setJitter(quality.getJitter());
+        return dto;
     }
 }

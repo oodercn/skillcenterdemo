@@ -247,6 +247,21 @@ public class SceneEngineAdapterImpl implements SceneEngineAdapter {
     }
 
     @Override
+    public net.ooder.scene.provider.SecurityProvider getSecurityProvider() {
+        return mockAdapter.getSecurityProvider();
+    }
+
+    @Override
+    public net.ooder.scene.provider.NetworkProvider getNetworkProvider() {
+        return mockAdapter.getNetworkProvider();
+    }
+
+    @Override
+    public net.ooder.scene.provider.HostingProvider getHostingProvider() {
+        return mockAdapter.getHostingProvider();
+    }
+
+    @Override
     public List<SkillInfoDTO> listInstalledSkills() {
         if (!engineAvailable || sceneClient == null) {
             return mockAdapter.listInstalledSkills();

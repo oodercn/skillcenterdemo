@@ -1,5 +1,8 @@
 package net.ooder.skillcenter.sdk;
 
+import net.ooder.scene.provider.SecurityProvider;
+import net.ooder.scene.provider.NetworkProvider;
+import net.ooder.scene.provider.HostingProvider;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.skillcenter.dto.scene.*;
 
@@ -8,6 +11,12 @@ import java.util.List;
 public interface SceneEngineAdapter {
 
     boolean isAvailable();
+
+    SecurityProvider getSecurityProvider();
+
+    NetworkProvider getNetworkProvider();
+
+    HostingProvider getHostingProvider();
 
     List<SkillInfoDTO> listInstalledSkills();
 

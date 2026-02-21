@@ -1,5 +1,8 @@
 package net.ooder.skillcenter.sdk;
 
+import net.ooder.scene.provider.SecurityProvider;
+import net.ooder.scene.provider.NetworkProvider;
+import net.ooder.scene.provider.HostingProvider;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.skillcenter.dto.scene.*;
 import org.slf4j.Logger;
@@ -21,6 +24,10 @@ public class SceneEngineAdapterMockImpl implements SceneEngineAdapter {
     private final Map<String, SceneGroupInfoDTO> sceneGroups = new ConcurrentHashMap<>();
     private final Map<String, List<SceneMemberInfoDTO>> groupMembers = new ConcurrentHashMap<>();
     private final Map<String, List<CapabilityInfoDTO>> sceneCapabilities = new ConcurrentHashMap<>();
+
+    private SecurityProvider securityProvider;
+    private NetworkProvider networkProvider;
+    private HostingProvider hostingProvider;
 
     @PostConstruct
     public void init() {
@@ -97,6 +104,33 @@ public class SceneEngineAdapterMockImpl implements SceneEngineAdapter {
     @Override
     public boolean isAvailable() {
         return true;
+    }
+
+    @Override
+    public SecurityProvider getSecurityProvider() {
+        return securityProvider;
+    }
+
+    @Override
+    public NetworkProvider getNetworkProvider() {
+        return networkProvider;
+    }
+
+    @Override
+    public HostingProvider getHostingProvider() {
+        return hostingProvider;
+    }
+
+    public void setSecurityProvider(SecurityProvider provider) {
+        this.securityProvider = provider;
+    }
+
+    public void setNetworkProvider(NetworkProvider provider) {
+        this.networkProvider = provider;
+    }
+
+    public void setHostingProvider(HostingProvider provider) {
+        this.hostingProvider = provider;
     }
 
     @Override
