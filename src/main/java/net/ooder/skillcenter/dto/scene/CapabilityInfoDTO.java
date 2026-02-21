@@ -1,11 +1,14 @@
 package net.ooder.skillcenter.dto.scene;
 
-public class CapabilityDTO {
+public class CapabilityInfoDTO {
     private String capId;
     private String sceneId;
     private String name;
     private String description;
     private String type;
+    private String status;
+
+    public CapabilityInfoDTO() {}
 
     public String getCapId() { return capId; }
     public void setCapId(String capId) { this.capId = capId; }
@@ -17,4 +20,6 @@ public class CapabilityDTO {
     public void setDescription(String description) { this.description = description; }
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

@@ -1,14 +1,11 @@
 package net.ooder.skillcenter.sdk;
 
-import net.ooder.sdk.api.OoderSDK;
 import net.ooder.skillcenter.config.SdkConfig;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.nexus.skillcenter.dto.network.NetworkLinkDTO;
 import net.ooder.nexus.skillcenter.dto.network.NetworkRouteDTO;
 import net.ooder.nexus.skillcenter.dto.network.NetworkTopologyDTO;
 import net.ooder.nexus.skillcenter.dto.network.NetworkQualityDTO;
-import net.ooder.nexus.skillcenter.dto.network.TopologyNodeDTO;
-import net.ooder.nexus.skillcenter.dto.network.TopologyLinkDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +28,8 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
     private NetworkSdkAdapterMockImpl mockAdapter;
 
     @Autowired
-    private AgentSDKWrapper sdkWrapper;
+    private SceneEngineAdapter sceneEngineAdapter;
 
-    private OoderSDK ooderSDK;
     private boolean sdkAvailable = false;
 
     @PostConstruct
@@ -44,24 +40,13 @@ public class NetworkSdkAdapterImpl implements NetworkSdkAdapter {
         }
 
         log.info("[NetworkSdkAdapter] Checking SDK availability...");
-        sdkAvailable = checkSdkAvailability();
+        sdkAvailable = sceneEngineAdapter.isAvailable();
 
         if (sdkAvailable) {
             log.info("[NetworkSdkAdapter] SDK is available, using real implementation");
         } else {
             log.warn("[NetworkSdkAdapter] SDK network APIs not available, falling back to mock");
         }
-    }
-
-    private boolean checkSdkAvailability() {
-        if (sdkWrapper != null && sdkWrapper.isInitialized()) {
-            try {
-                return true;
-            } catch (Exception e) {
-                log.warn("[NetworkSdkAdapter] SDK availability check failed: {}", e.getMessage());
-            }
-        }
-        return false;
     }
 
     @Override

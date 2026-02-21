@@ -14,7 +14,7 @@ import net.ooder.skillcenter.market.SkillListing;
 import net.ooder.skillcenter.market.SkillMarketManager;
 import net.ooder.skillcenter.manager.GroupManager;
 import net.ooder.skillcenter.manager.SkillManager;
-import net.ooder.sdk.api.skill.SkillPackage;
+import net.ooder.skillcenter.dto.scene.SkillInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -263,7 +263,7 @@ public class SkillController extends BaseController {
             String owner = request.getOwner();
             String skillsPath = request.getSkillsPath();
             
-            List<SkillPackage> packages;
+            List<SkillInfoDTO> packages;
             if (owner != null && !owner.isEmpty()) {
                 if (skillsPath != null && !skillsPath.isEmpty()) {
                     packages = gitDiscoveryService.discoverFromGitHub(owner, skillsPath).get();
@@ -310,15 +310,15 @@ public class SkillController extends BaseController {
         }
     }
 
-    private SkillListing convertSkillPackageToListing(SkillPackage pkg) {
+    private SkillListing convertSkillPackageToListing(SkillInfoDTO pkg) {
         SkillListing listing = new SkillListing();
         listing.setSkillId(pkg.getSkillId());
         listing.setName(pkg.getName() != null ? pkg.getName() : pkg.getSkillId());
         listing.setDescription(pkg.getDescription());
         listing.setVersion(pkg.getVersion());
         listing.setType("git");
-        listing.setRepository(pkg.getSource());
-        listing.setDownloadUrl(pkg.getDownloadUrl());
+        listing.setRepository(pkg.getAuthor());
+        listing.setDownloadUrl(pkg.getCategory());
         return listing;
     }
 

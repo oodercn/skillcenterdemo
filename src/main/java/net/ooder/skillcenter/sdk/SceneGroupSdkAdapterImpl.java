@@ -1,8 +1,5 @@
 package net.ooder.skillcenter.sdk;
 
-import net.ooder.sdk.api.scene.SceneGroupManager;
-import net.ooder.sdk.api.scene.SceneGroup;
-import net.ooder.sdk.api.scene.SceneMember;
 import net.ooder.skillcenter.config.SdkConfig;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.skillcenter.dto.scene.*;
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -29,184 +25,79 @@ public class SceneGroupSdkAdapterImpl implements SceneGroupSdkAdapter {
     private SceneGroupSdkAdapterMockImpl mockAdapter;
 
     @Autowired
-    private AgentSDKWrapper sdkWrapper;
-
-    private SceneGroupManager sceneGroupManager;
-    private boolean sdkAvailable = false;
+    private SceneEngineAdapter sceneEngineAdapter;
 
     @PostConstruct
     public void init() {
-        if (sdkConfig.isMockMode()) {
-            log.info("[SceneGroupSdkAdapter] Running in mock mode");
-            return;
-        }
-        
-        log.info("[SceneGroupSdkAdapter] Checking SDK availability...");
-        sdkAvailable = checkSdkAvailability();
-        
-        if (sdkAvailable) {
-            log.info("[SceneGroupSdkAdapter] SDK is available, using real implementation");
-        } else {
-            log.warn("[SceneGroupSdkAdapter] SDK scene group APIs not available, falling back to mock");
-        }
+        log.info("[SceneGroupSdkAdapter] Initialized with SceneEngineAdapter");
     }
 
-    private boolean checkSdkAvailability() {
-        if (sdkWrapper != null && sdkWrapper.isInitialized()) {
-            sceneGroupManager = sdkWrapper.getSceneGroupManager();
-            return sceneGroupManager != null;
-        }
-        return false;
+    @Override
+    public boolean isAvailable() {
+        return sceneEngineAdapter.isAvailable();
     }
 
     @Override
     public SceneGroupDTO createSceneGroup(String sceneId, SceneGroupConfigDTO config) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.createSceneGroup(sceneId, config);
-        }
-        
-        log.debug("[SceneGroupSdkAdapter] Creating scene group via SDK for scene: {}", sceneId);
-        try {
-            SceneGroupManager.SceneGroupConfig sdkConfig = new SceneGroupManager.SceneGroupConfig();
-            SceneGroup group = sceneGroupManager.create(sceneId, sdkConfig).get();
-            SceneGroupDTO dto = new SceneGroupDTO();
-            dto.setSceneId(group.getSceneId());
-            return dto;
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to create scene group: {}", e.getMessage());
-            return mockAdapter.createSceneGroup(sceneId, config);
-        }
+        SceneGroupInfoDTO group = sceneEngineAdapter.createSceneGroup(sceneId, config);
+        return convertToDTO(group);
     }
 
     @Override
     public boolean destroySceneGroup(String sceneGroupId) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.destroySceneGroup(sceneGroupId);
-        }
-        
-        log.debug("[SceneGroupSdkAdapter] Destroying scene group via SDK: {}", sceneGroupId);
-        try {
-            sceneGroupManager.destroy(sceneGroupId).get();
-            return true;
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to destroy scene group: {}", e.getMessage());
-            return mockAdapter.destroySceneGroup(sceneGroupId);
-        }
+        return sceneEngineAdapter.destroySceneGroup(sceneGroupId);
     }
 
     @Override
     public SceneGroupDTO getSceneGroup(String sceneGroupId) {
-        return mockAdapter.getSceneGroup(sceneGroupId);
+        List<SceneGroupInfoDTO> groups = sceneEngineAdapter.listSceneGroups();
+        for (SceneGroupInfoDTO g : groups) {
+            if (g.getSceneGroupId().equals(sceneGroupId)) {
+                return convertToDTO(g);
+            }
+        }
+        return null;
     }
 
     @Override
     public PageResult<SceneGroupDTO> listSceneGroups(int pageNum, int pageSize) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.listSceneGroups(pageNum, pageSize);
+        PageResult<SceneGroupInfoDTO> result = sceneEngineAdapter.listSceneGroupsPaged(pageNum, pageSize);
+        List<SceneGroupDTO> list = new ArrayList<>();
+        for (SceneGroupInfoDTO g : result.getList()) {
+            list.add(convertToDTO(g));
         }
-        
-        try {
-            List<SceneGroup> groups = sceneGroupManager.listAll().get();
-            List<SceneGroupDTO> dtos = groups.stream()
-                .map(group -> {
-                    SceneGroupDTO dto = new SceneGroupDTO();
-                    dto.setSceneId(group.getSceneId());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-            return paginate(dtos, pageNum, pageSize);
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to list scene groups: {}", e.getMessage());
-            return mockAdapter.listSceneGroups(pageNum, pageSize);
-        }
+        return new PageResult<>(list, result.getTotal(), result.getPageNum(), result.getPageSize());
     }
 
     @Override
     public boolean joinSceneGroup(String sceneGroupId, String agentId, String role) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.joinSceneGroup(sceneGroupId, agentId, role);
-        }
-        
-        log.debug("[SceneGroupSdkAdapter] Agent {} joining scene group via SDK: {}", agentId, sceneGroupId);
-        try {
-            sceneGroupManager.join(sceneGroupId, agentId, null).get();
-            return true;
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to join scene group: {}", e.getMessage());
-            return mockAdapter.joinSceneGroup(sceneGroupId, agentId, role);
-        }
+        return sceneEngineAdapter.joinSceneGroup(sceneGroupId, agentId, role);
     }
 
     @Override
     public boolean leaveSceneGroup(String sceneGroupId, String agentId) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.leaveSceneGroup(sceneGroupId, agentId);
-        }
-        
-        log.debug("[SceneGroupSdkAdapter] Agent {} leaving scene group via SDK: {}", agentId, sceneGroupId);
-        try {
-            sceneGroupManager.leave(sceneGroupId, agentId).get();
-            return true;
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to leave scene group: {}", e.getMessage());
-            return mockAdapter.leaveSceneGroup(sceneGroupId, agentId);
-        }
+        return sceneEngineAdapter.leaveSceneGroup(sceneGroupId, agentId);
     }
 
     @Override
     public PageResult<SceneMemberDTO> listMembers(String sceneGroupId, int pageNum, int pageSize) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.listMembers(sceneGroupId, pageNum, pageSize);
+        PageResult<SceneMemberInfoDTO> result = sceneEngineAdapter.listMembersPaged(sceneGroupId, pageNum, pageSize);
+        List<SceneMemberDTO> list = new ArrayList<>();
+        for (SceneMemberInfoDTO m : result.getList()) {
+            list.add(convertMemberToDTO(m));
         }
-        
-        try {
-            List<SceneMember> members = sceneGroupManager.listMembers(sceneGroupId).get();
-            List<SceneMemberDTO> dtos = members.stream()
-                .map(member -> {
-                    SceneMemberDTO dto = new SceneMemberDTO();
-                    dto.setAgentId(member.getAgentId());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-            return paginate(dtos, pageNum, pageSize);
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to list members: {}", e.getMessage());
-            return mockAdapter.listMembers(sceneGroupId, pageNum, pageSize);
-        }
+        return new PageResult<>(list, result.getTotal(), result.getPageNum(), result.getPageSize());
     }
 
     @Override
     public SceneMemberDTO getPrimaryMember(String sceneGroupId) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.getPrimaryMember(sceneGroupId);
-        }
-        
-        try {
-            SceneMember primary = sceneGroupManager.getPrimary(sceneGroupId).get();
-            if (primary == null) return null;
-            SceneMemberDTO dto = new SceneMemberDTO();
-            dto.setAgentId(primary.getAgentId());
-            return dto;
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to get primary member: {}", e.getMessage());
-            return mockAdapter.getPrimaryMember(sceneGroupId);
-        }
+        SceneMemberInfoDTO member = sceneEngineAdapter.getPrimaryMember(sceneGroupId);
+        return member != null ? convertMemberToDTO(member) : null;
     }
 
     @Override
     public boolean handleFailover(String sceneGroupId, String failedMemberId) {
-        if (!sdkAvailable || sceneGroupManager == null) {
-            return mockAdapter.handleFailover(sceneGroupId, failedMemberId);
-        }
-        
-        log.debug("[SceneGroupSdkAdapter] Handling failover via SDK for scene group: {}", sceneGroupId);
-        try {
-            sceneGroupManager.handleFailover(sceneGroupId, failedMemberId).get();
-            return true;
-        } catch (Exception e) {
-            log.error("[SceneGroupSdkAdapter] Failed to handle failover: {}", e.getMessage());
-            return mockAdapter.handleFailover(sceneGroupId, failedMemberId);
-        }
+        return sceneEngineAdapter.handleFailover(sceneGroupId, failedMemberId);
     }
 
     @Override
@@ -244,21 +135,28 @@ public class SceneGroupSdkAdapterImpl implements SceneGroupSdkAdapter {
         return mockAdapter.addVfsPermission(sceneGroupId, agentId, permissionType, path);
     }
 
-    @Override
-    public boolean isAvailable() {
-        return sdkAvailable || mockAdapter.isAvailable();
+    private SceneGroupDTO convertToDTO(SceneGroupInfoDTO info) {
+        SceneGroupDTO dto = new SceneGroupDTO();
+        dto.setSceneGroupId(info.getSceneGroupId());
+        dto.setSceneId(info.getSceneId());
+        dto.setName(info.getName());
+        dto.setStatus(info.getStatus());
+        dto.setMemberCount(info.getMemberCount() != null ? info.getMemberCount() : 0);
+        if (info.getCreatedAt() != null) {
+            dto.setCreateTime(info.getCreatedAt());
+        }
+        return dto;
     }
 
-    private <T> PageResult<T> paginate(List<T> list, int pageNum, int pageSize) {
-        int total = list.size();
-        int start = (pageNum - 1) * pageSize;
-        int end = Math.min(start + pageSize, total);
-
-        if (start >= total) {
-            return PageResult.empty();
+    private SceneMemberDTO convertMemberToDTO(SceneMemberInfoDTO info) {
+        SceneMemberDTO dto = new SceneMemberDTO();
+        dto.setAgentId(info.getAgentId());
+        dto.setRole(info.getRole());
+        dto.setSceneGroupId(info.getSceneGroupId());
+        dto.setStatus(info.getStatus());
+        if (info.getJoinedAt() != null) {
+            dto.setJoinTime(info.getJoinedAt());
         }
-
-        List<T> pageList = list.subList(start, end);
-        return PageResult.of(pageList, total, pageNum, pageSize);
+        return dto;
     }
 }

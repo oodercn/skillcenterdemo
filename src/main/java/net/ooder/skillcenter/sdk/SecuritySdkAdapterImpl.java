@@ -1,6 +1,5 @@
 package net.ooder.skillcenter.sdk;
 
-import net.ooder.sdk.api.OoderSDK;
 import net.ooder.skillcenter.config.SdkConfig;
 import net.ooder.skillcenter.dto.PageResult;
 import net.ooder.nexus.skillcenter.dto.security.SecurityPolicyDTO;
@@ -14,7 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Map;
 
 @Component
 @Primary
@@ -29,9 +28,8 @@ public class SecuritySdkAdapterImpl implements SecuritySdkAdapter {
     private SecuritySdkAdapterMockImpl mockAdapter;
 
     @Autowired
-    private AgentSDKWrapper sdkWrapper;
+    private SceneEngineAdapter sceneEngineAdapter;
 
-    private OoderSDK ooderSDK;
     private boolean sdkAvailable = false;
 
     @PostConstruct
@@ -42,24 +40,13 @@ public class SecuritySdkAdapterImpl implements SecuritySdkAdapter {
         }
 
         log.info("[SecuritySdkAdapter] Checking SDK availability...");
-        sdkAvailable = checkSdkAvailability();
+        sdkAvailable = sceneEngineAdapter.isAvailable();
 
         if (sdkAvailable) {
             log.info("[SecuritySdkAdapter] SDK is available, using real implementation");
         } else {
             log.warn("[SecuritySdkAdapter] SDK security APIs not available, falling back to mock");
         }
-    }
-
-    private boolean checkSdkAvailability() {
-        if (sdkWrapper != null && sdkWrapper.isInitialized()) {
-            try {
-                return true;
-            } catch (Exception e) {
-                log.warn("[SecuritySdkAdapter] SDK availability check failed: {}", e.getMessage());
-            }
-        }
-        return false;
     }
 
     @Override

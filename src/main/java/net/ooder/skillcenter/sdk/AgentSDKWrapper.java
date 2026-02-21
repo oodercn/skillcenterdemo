@@ -1,12 +1,6 @@
 package net.ooder.skillcenter.sdk;
 
-import net.ooder.sdk.api.OoderSDK;
-import net.ooder.sdk.infra.config.SDKConfiguration;
-import net.ooder.sdk.api.skill.*;
-import net.ooder.sdk.api.scene.SceneManager;
-import net.ooder.sdk.api.scene.SceneGroupManager;
-import net.ooder.sdk.core.skill.impl.SkillPackageManagerImpl;
-import net.ooder.sdk.core.scene.impl.SceneManagerImpl;
+import net.ooder.skillcenter.dto.scene.*;
 import net.ooder.skillcenter.config.SdkConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -27,101 +19,27 @@ public class AgentSDKWrapper {
     @Autowired
     private SdkConfig sdkConfig;
 
-    private OoderSDK ooderSDK;
-    private SkillPackageManager skillPackageManager;
-    private SceneManager sceneManager;
-    private SceneGroupManager sceneGroupManager;
-    
-    private boolean initialized = false;
-    private final Map<String, SkillPackage> skillCache = new ConcurrentHashMap<>();
+    @Autowired
+    private SceneEngineAdapter sceneEngineAdapter;
+
+    private final Map<String, SkillInfoDTO> skillCache = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
-        if (!sdkConfig.isMockMode()) {
-            initializeSDK();
-        } else {
-            log.info("[AgentSDKWrapper] Running in mock mode, SDK not initialized");
-        }
+        log.info("[AgentSDKWrapper] Initializing with SceneEngineAdapter...");
+        log.info("[AgentSDKWrapper] Mode: {}", sdkConfig.getMode());
+        log.info("[AgentSDKWrapper] SceneEngineAdapter available: {}", sceneEngineAdapter.isAvailable());
+
+        loadInstalledSkills();
     }
 
-    private void initializeSDK() {
-        try {
-            log.info("[AgentSDKWrapper] Initializing OoderSDK v0.7.2...");
-            
-            SDKConfiguration config = new SDKConfiguration();
-            config.setAgentId(sdkConfig.getAgentId());
-            config.setAgentName(sdkConfig.getAgentName());
-            config.setEndpoint(sdkConfig.getEndpoint());
-            config.setUdpPort(sdkConfig.getUdpPort());
-            config.setHeartbeatInterval(sdkConfig.getHeartbeatInterval());
-            config.setHeartbeatTimeout(sdkConfig.getHeartbeatTimeout());
-            config.setHeartbeatLossThreshold(sdkConfig.getHeartbeatLossThreshold());
-            config.setSkillRootPath(sdkConfig.getBasePath());
-            config.setSkillCenterUrl(sdkConfig.getSkillCenterUrl());
-            config.setDiscoveryEnabled(true);
-            
-            log.info("[AgentSDKWrapper] Configuration:");
-            log.info("[AgentSDKWrapper] - agentId: {}", config.getAgentId());
-            log.info("[AgentSDKWrapper] - agentName: {}", config.getAgentName());
-            log.info("[AgentSDKWrapper] - endpoint: {}", config.getEndpoint());
-            log.info("[AgentSDKWrapper] - skillRootPath: {}", config.getSkillRootPath());
-            log.info("[AgentSDKWrapper] - skillCenterUrl: {}", config.getSkillCenterUrl());
-            
-            // 创建SkillPackageManager实现
-            skillPackageManager = new SkillPackageManagerImpl();
-            if (skillPackageManager instanceof SkillPackageManagerImpl) {
-                ((SkillPackageManagerImpl) skillPackageManager).setSkillRootPath(config.getSkillRootPath());
-            }
-            log.info("[AgentSDKWrapper] Created SkillPackageManagerImpl");
-            
-            // 创建SceneManager实现
-            sceneManager = new SceneManagerImpl();
-            log.info("[AgentSDKWrapper] Created SceneManagerImpl");
-            
-            ooderSDK = OoderSDK.builder()
-                .configuration(config)
-                .skillPackageManager(skillPackageManager)
-                .sceneManager(sceneManager)
-                .build();
-            
-            ooderSDK.initialize();
-            ooderSDK.start();
-            
-            // 从SDK获取可能被覆盖的服务
-            sceneGroupManager = ooderSDK.getSceneGroupManager();
-            
-            log.info("[AgentSDKWrapper] OoderSDK initialized successfully");
-            log.info("[AgentSDKWrapper] - SkillPackageManager: {}", skillPackageManager != null ? "available" : "null");
-            log.info("[AgentSDKWrapper] - SceneManager: {}", sceneManager != null ? "available" : "null");
-            log.info("[AgentSDKWrapper] - SceneGroupManager: {}", sceneGroupManager != null ? "available" : "null");
-            log.info("[AgentSDKWrapper] - isInitialized: {}", ooderSDK.isInitialized());
-            log.info("[AgentSDKWrapper] - isStarted: {}", ooderSDK.isStarted());
-            
-            initialized = true;
-            
-            loadInstalledSkills();
-            
-        } catch (Exception e) {
-            log.error("[AgentSDKWrapper] Failed to initialize OoderSDK: {}", e.getMessage(), e);
-            initialized = false;
-        }
-    }
-    
     private void loadInstalledSkills() {
-        if (skillPackageManager == null) {
-            log.info("[AgentSDKWrapper] SkillPackageManager not available, skipping skill loading");
-            return;
-        }
-        
         try {
-            List<InstalledSkill> installed = skillPackageManager.listInstalled().get();
-            if (installed != null) {
-                log.info("[AgentSDKWrapper] Found {} installed skills", installed.size());
-                for (InstalledSkill skill : installed) {
-                    SkillPackage pkg = skillPackageManager.getPackage(skill.getSkillId()).get();
-                    if (pkg != null) {
-                        skillCache.put(pkg.getSkillId(), pkg);
-                    }
+            List<SkillInfoDTO> skills = sceneEngineAdapter.listInstalledSkills();
+            if (skills != null) {
+                log.info("[AgentSDKWrapper] Found {} installed skills", skills.size());
+                for (SkillInfoDTO skill : skills) {
+                    skillCache.put(skill.getSkillId(), skill);
                 }
             }
         } catch (Exception e) {
@@ -129,154 +47,96 @@ public class AgentSDKWrapper {
         }
     }
 
-    @PreDestroy
-    public void destroy() {
-        if (ooderSDK != null) {
-            try {
-                ooderSDK.stop();
-                log.info("[AgentSDKWrapper] OoderSDK stopped successfully");
-            } catch (Exception e) {
-                log.error("[AgentSDKWrapper] Error during shutdown: {}", e.getMessage(), e);
-            }
-        }
-    }
-
     public boolean isInitialized() {
-        return initialized;
+        return sceneEngineAdapter.isAvailable();
     }
 
-    public SkillPackageManager getSkillPackageManager() {
-        return skillPackageManager;
+    public SceneEngineAdapter getSceneEngineAdapter() {
+        return sceneEngineAdapter;
     }
 
-    public SceneManager getSceneManager() {
-        return sceneManager;
-    }
-
-    public SceneGroupManager getSceneGroupManager() {
-        return sceneGroupManager;
-    }
-
-    public SkillPackage getSkill(String skillId) {
+    public SkillInfoDTO getSkill(String skillId) {
         if (skillCache.containsKey(skillId)) {
             return skillCache.get(skillId);
         }
-        
-        if (initialized && skillPackageManager != null) {
-            try {
-                SkillPackage pkg = skillPackageManager.getPackage(skillId).get();
-                if (pkg != null) {
-                    skillCache.put(skillId, pkg);
-                }
-                return pkg;
-            } catch (Exception e) {
-                log.error("[AgentSDKWrapper] Failed to get skill: {}", e.getMessage());
-            }
+
+        SkillInfoDTO skill = sceneEngineAdapter.getSkill(skillId);
+        if (skill != null) {
+            skillCache.put(skillId, skill);
         }
-        return null;
+        return skill;
     }
 
-    public Map<String, SkillPackage> getAllSkills() {
-        if (!initialized || skillPackageManager == null) {
-            return Collections.emptyMap();
+    public Map<String, SkillInfoDTO> getAllSkills() {
+        List<SkillInfoDTO> skills = sceneEngineAdapter.listInstalledSkills();
+        Map<String, SkillInfoDTO> result = new HashMap<>();
+        for (SkillInfoDTO skill : skills) {
+            result.put(skill.getSkillId(), skill);
+            skillCache.put(skill.getSkillId(), skill);
         }
-        
-        try {
-            List<InstalledSkill> installed = skillPackageManager.listInstalled().get();
-            if (installed != null) {
-                Map<String, SkillPackage> result = new HashMap<>();
-                for (InstalledSkill skill : installed) {
-                    SkillPackage pkg = skillPackageManager.getPackage(skill.getSkillId()).get();
-                    if (pkg != null) {
-                        result.put(pkg.getSkillId(), pkg);
-                        skillCache.put(pkg.getSkillId(), pkg);
-                    }
-                }
-                return result;
-            }
-        } catch (Exception e) {
-            log.error("[AgentSDKWrapper] Failed to get all skills: {}", e.getMessage());
-        }
-        
-        return new HashMap<>(skillCache);
-    }
-    
-    public List<SkillPackage> listAllSkills() {
-        if (!initialized || skillPackageManager == null) {
-            return Collections.emptyList();
-        }
-        
-        try {
-            List<InstalledSkill> installed = skillPackageManager.listInstalled().get();
-            if (installed != null) {
-                List<SkillPackage> result = new ArrayList<>();
-                for (InstalledSkill skill : installed) {
-                    SkillPackage pkg = skillPackageManager.getPackage(skill.getSkillId()).get();
-                    if (pkg != null) {
-                        result.add(pkg);
-                        skillCache.put(pkg.getSkillId(), pkg);
-                    }
-                }
-                return result;
-            }
-        } catch (Exception e) {
-            log.error("[AgentSDKWrapper] Failed to list all skills: {}", e.getMessage());
-        }
-        
-        return new ArrayList<>(skillCache.values());
+        return result;
     }
 
-    public InstallResult installSkill(SkillPackage skillPackage) {
-        if (initialized && skillPackageManager != null) {
-            try {
-                InstallRequest request = new InstallRequest();
-                request.setSkillId(skillPackage.getSkillId());
-                InstallResult result = skillPackageManager.install(request).get();
-                if (result.isSuccess()) {
-                    skillCache.put(skillPackage.getSkillId(), skillPackage);
-                }
-                return result;
-            } catch (Exception e) {
-                log.error("[AgentSDKWrapper] Failed to install skill: {}", e.getMessage());
-                InstallResult result = new InstallResult();
-                result.setSuccess(false);
-                result.setError(e.getMessage());
-                return result;
+    public List<SkillInfoDTO> listAllSkills() {
+        List<SkillInfoDTO> skills = sceneEngineAdapter.listInstalledSkills();
+        for (SkillInfoDTO skill : skills) {
+            skillCache.put(skill.getSkillId(), skill);
+        }
+        return skills;
+    }
+
+    public SkillInstallResultDTO installSkill(String skillId) {
+        SkillInstallResultDTO result = sceneEngineAdapter.installSkill(skillId);
+        if (result.isSuccess()) {
+            SkillInfoDTO skill = sceneEngineAdapter.getSkill(skillId);
+            if (skill != null) {
+                skillCache.put(skillId, skill);
             }
         }
-        InstallResult result = new InstallResult();
-        result.setSuccess(false);
-        result.setError("SDK not initialized");
         return result;
     }
-    
-    public CompletableFuture<InstallResult> installSkillAsync(String skillId) {
-        if (initialized && skillPackageManager != null) {
-            InstallRequest request = new InstallRequest();
-            request.setSkillId(skillId);
-            return skillPackageManager.install(request);
+
+    public SkillUninstallResultDTO uninstallSkill(String skillId) {
+        SkillUninstallResultDTO result = sceneEngineAdapter.uninstallSkill(skillId);
+        if (result.isSuccess()) {
+            skillCache.remove(skillId);
         }
-        return CompletableFuture.completedFuture(createErrorResult("SDK not initialized"));
-    }
-    
-    public CompletableFuture<UninstallResult> uninstallSkillAsync(String skillId) {
-        if (initialized && skillPackageManager != null) {
-            return skillPackageManager.uninstall(skillId);
-        }
-        return CompletableFuture.completedFuture(createUninstallErrorResult("SDK not initialized"));
-    }
-    
-    private InstallResult createErrorResult(String error) {
-        InstallResult result = new InstallResult();
-        result.setSuccess(false);
-        result.setError(error);
         return result;
     }
-    
-    private UninstallResult createUninstallErrorResult(String error) {
-        UninstallResult result = new UninstallResult();
-        result.setSuccess(false);
-        result.setError(error);
-        return result;
+
+    public SceneInfoDTO createScene(SceneInfoDTO scene) {
+        return sceneEngineAdapter.createScene(scene);
+    }
+
+    public SceneInfoDTO getScene(String sceneId) {
+        return sceneEngineAdapter.getScene(sceneId);
+    }
+
+    public List<SceneInfoDTO> listScenes() {
+        return sceneEngineAdapter.listScenes();
+    }
+
+    public boolean activateScene(String sceneId) {
+        return sceneEngineAdapter.activateScene(sceneId);
+    }
+
+    public boolean deactivateScene(String sceneId) {
+        return sceneEngineAdapter.deactivateScene(sceneId);
+    }
+
+    public SceneGroupInfoDTO createSceneGroup(String sceneId, SceneGroupConfigDTO config) {
+        return sceneEngineAdapter.createSceneGroup(sceneId, config);
+    }
+
+    public boolean joinSceneGroup(String sceneGroupId, String agentId, String role) {
+        return sceneEngineAdapter.joinSceneGroup(sceneGroupId, agentId, role);
+    }
+
+    public List<SceneGroupInfoDTO> listSceneGroups() {
+        return sceneEngineAdapter.listSceneGroups();
+    }
+
+    public List<SceneMemberInfoDTO> listMembers(String sceneGroupId) {
+        return sceneEngineAdapter.listMembers(sceneGroupId);
     }
 }
